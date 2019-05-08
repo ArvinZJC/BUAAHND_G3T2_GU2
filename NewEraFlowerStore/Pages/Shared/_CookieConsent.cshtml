@@ -1,0 +1,25 @@
+﻿@* the cookie consent partial view *@
+
+@using Microsoft.AspNetCore.Http.Features
+
+@{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
+}
+
+@if (showBanner)
+{
+    <div id="cookie-consent" class="alert alert-warning alert-dismissible mb-0 fadew fixed-bottom show" style="padding-right: 1.25rem" role="alert">
+        <div class="row">
+            <div class="col d-flex align-items-center text-justify py-1">
+                <b>We strongly recommend you to accept cookies from this site to better serve you. By doing so, you acknowledge reading our <a asp-page="/Help/PrivacyPolicy" class="text-decoration-none text-success">privacy policy</a>. If you ignore this notice, however, some areas of the site may not function properly.</b>
+            </div>
+            <div class="col-auto d-flex align-items-center justify-content-center py-1">
+                <button type="button" class="btn btn-success" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
+                    <span aria-hidden="true">Accept</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}

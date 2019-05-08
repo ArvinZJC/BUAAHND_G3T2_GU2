@@ -1,0 +1,40 @@
+﻿@* the FAQ page *@
+@page
+
+@model FaqModel
+
+@{
+    ViewData["Title"] = "FAQ";
+    ViewData["StorePage"] = HeaderNavigation.Help;
+    ViewData["HelpPage"] = HelpMenu.Faq;
+    ViewData["ReturnUrl"] = "~/Help/Faq";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Help - FAQ</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h1 class="text-center">@ViewData["Title"]</h1>
+<p class="text-justify font-weight-bold mb-0">1. What can I do when the correct captcha is entered on the login page but the relevant validation is failed?</p>
+<p class="text-justify text-muted">This is usually because something wrong with the cookie required. We recommend you to accept cookies from this site. If you have already done this and the problem remains, try clearing cookies and reloading the page. Please notice that you can change the captcha image by clicking on it.</p>
+<p class="text-justify font-weight-bold mb-0">2. Why do I receive the error code 500 (Internal Server Error) when I try to register/reset the password/send a verification email?</p>
+<p class="text-justify text-muted">This is usually because our email sender is disabled by the service provider. In such a situation, we are sorry for this and we will fix it as soon as possible. If you encounter this problem during the register process, generally your account has been created successfully and you can log in.</p>
+<p class="text-justify font-weight-bold mb-0">3. I cannot find any emails sent from the store. What should I do?</p>
+<p class="text-justify text-muted">Make sure that the email address provided for us is correct. Since emails sent from the store contain links, these emails may be considered spam. If you still fail to find any, you may try to register/reset the password/send a verification email again.</p>
+<p class="text-justify font-weight-bold mb-0">4. Why do I fail to change the avatar?</p>
+<p class="text-justify text-muted">Make sure that the JPG/JPEG/PNG image file uploaded is less than 250 KB, and please notice that an image uploader of the site does not support any versions of Internet Explorer. You may try again if you encounter any errors.</p>
+<p class="text-justify font-weight-bold mb-0">5. Is there any description of each order status?</p>
+<p class="text-justify text-muted mb-1">The answer is absolutely yes. Please refer to the following form to know more about each order status.</p>
+<ejs-grid id="data-grid-order-status" allowSelection="true" dataSource="@Model.OrderStatusForm" height="auto" width="auto">
+    <e-grid-columns>
+        <e-grid-column field="DisplayName" headerText="Order status" clipMode="EllipsisWithTooltip" width="100"></e-grid-column>
+        <e-grid-column field="Description" template="#template-show-entire-description" width="200"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script type="text/x-jsrender" id="template-show-entire-description">
+    <span class="text-wrap">${Description}</span>
+</script>
+
+<p class="text-center mt-3 mb-0">Helpless? Please <a asp-page="/Help/ContactUs" class="text-decoration-none text-success">contact us</a>.</p>

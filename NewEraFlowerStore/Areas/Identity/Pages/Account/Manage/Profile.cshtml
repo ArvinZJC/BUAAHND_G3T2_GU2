@@ -1,0 +1,252 @@
+﻿@* the user profile page *@
+@page
+
+@using Syncfusion.EJ2.Inputs
+
+@model ProfileModel
+
+@{
+    ViewData["Title"] = ViewData["UserCentreFunction"] = "Profile";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.Profile;
+
+    UploaderAsyncSettings asyncSettings = null;
+
+    if (!Model.IsAdministrator)
+    {
+        asyncSettings = new UploaderAsyncSettings { SaveUrl = @Url.Content("~/AvatarUploader/SaveAsync"), RemoveUrl = @Url.Content("~/AvatarUploader/DeleteAsync") };
+    }
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (!Model.IsEmailConfirmed)
+{
+    <form asp-area="Identity" asp-page="/Account/Manage/Profile" asp-page-handler="SendVerificationEmail" method="post" class="form-group">
+        <button type="submit" class="btn btn-danger btn-block">Send a verification email</button>
+    </form>
+    <hr class="mx-3" />
+}
+
+@if (!Model.IsAdministrator)
+{
+    <label id="label-avatar" class="e-control item-title">Avatar</label>
+    <div class="row" onmouseover="activateLabelAvatar()" onmouseout="deactivateLabelAvatar()">
+        <div class="col-md-auto py-2">
+            <div class="row d-flex justify-content-center">
+                <div class="col-auto d-flex align-items-end pr-0">
+                    <div class="e-avatar e-avatar-circle shadow" style="font-size: 40px">
+                        <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + Model.AvatarUrl)" alt="Large Avatar" />
+                    </div>
+                </div>
+                <div class="col-auto d-flex align-items-end px-0">
+                    <div class="e-avatar e-avatar-xsmall e-avatar-circle shadow">
+                        <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + Model.AvatarUrl)" alt="Small Avatar" />
+                    </div>
+                </div>
+                <div class="col-auto d-flex align-items-start pl-0">
+                    <button type="button" id="button-change-avatar" class="btn btn-outline-success rounded-circle pt-1 pr-2 shadow" style="padding-left: 0.56rem !important" title="Change your avatar." onclick="openFileBrowser()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md d-flex align-items-start justify-content-center py-2">
+            <div role="alert" class="alert alert-warning mb-0 py-1" style="font-size: 12px">
+                <h6 class="alert-heading">Notes</h6>
+                <p class="text-justify mb-0">1. Only a JPG/JPEG/PNG image file less than 250 KB is accepted.</p>
+                <p class="text-justify mb-0">2. A square image larger than 200px*200px is suggested.</p>
+                <p class="text-justify mb-0">3. Internet Explorer is not supported.</p>
+            </div>
+        </div>
+        <div class="col-md py-2">
+            <ejs-uploader id="uploader-avatar" allowedExtensions=".jpg,.jpeg,.png" asyncSettings="@asyncSettings" autoUpload="true" dropArea="none" locale="customised" maxFileSize="250000" multiple="false"></ejs-uploader>
+        </div>
+    </div>
+    <hr class="mx-3" />
+}
+
+<form asp-area="Identity" asp-page="/Account/Manage/Profile" asp-page-handler="Save" method="post">
+    <p class="text-justify">※ Fields marked with "*" are required.</p>
+    <div class="form-group row">
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-first-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="TopLeft">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        @if (Model.IsAdministrator)
+                        {
+                            <input asp-for="Input.FirstName" autofocus required />
+                        }
+                        else
+                        {
+                            <input asp-for="Input.FirstName" required />
+                        }
+
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.FirstName" class="e-float-text"></label>
+                    </div>
+                    <div class="text-justify">
+                        <span asp-validation-for="Input.FirstName" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-last-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="TopRight">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        <input asp-for="Input.LastName" required />
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.LastName" class="e-float-text"></label>
+                    </div>
+                    <div class="text-justify">
+                        <span asp-validation-for="Input.LastName" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+    </div>
+    <div class="form-group">
+        <ejs-tooltip id="tooltip-username" content="1. At max 25 characters long.<br />2. No non-alphanumeric character." position="TopLeft">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Input.Username" required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Input.Username" class="e-float-text"></label>
+                </div>
+                <div class="text-justify">
+                    <span asp-validation-for="Input.Username" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <!-- set the type attribute value to "text" instead of "email" to float the relevant label correctly when the email address entered is invalid -->
+            <input asp-for="Input.Email" type="text" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.Email" class="e-float-text"></label>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Input.Email" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+
+    @if (!Model.IsAdministrator)
+    {
+        <div class="form-group row mt-3">
+            <div class="col-5 mt-3">
+                <ejs-dropdownlist ejs-for="@Model.Input.GenderId" id="dropdown-list-gender" cssClass="e-success mt-0" dataSource="@Model.GenderList" floatLabelType="Auto" placeholder="@Html.DisplayNameFor(Model => Model.Input.GenderId)" showClearButton="true" name="Input.GenderId">
+                    <e-dropdownlist-fields text="DisplayName" value="ID"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+            </div>
+            <div class="col-7 mt-3">
+                <div class="row">
+                    <div class="col pr-0">
+                        <!-- the date range is from the 1st day of the year which is 120 years ago to today -->
+                        <ejs-datepicker ejs-for="@Model.Input.DOB" id="date-picker-dob" cssClass="e-success" allowEdit="false" floatLabelType="Auto" format="d MMMM yyyy" max="@DateTime.Now" min="@new DateTime(DateTime.Now.Year - 120, 1, 1)" start="Decade" showTodayButton="false" name="Input.DOB"></ejs-datepicker>
+                    </div>
+                    <div class="col-auto d-flex align-items-center pl-0">
+                        <i role="button" id="dob-clear-icon" class="close fas fa-times pl-2" style="cursor: pointer; font-size: 1rem" hidden></i>
+                    </div>
+                </div>
+                <div class="e-control text-justify">
+                    <span asp-validation-for="Input.DOB" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <input asp-for="Input.PhoneNumber" />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.PhoneNumber" class="e-float-text"></label>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" id="button-save-profile" class="btn btn-success btn-block" @(Model.IsEmailConfirmed ? string.Empty : "disabled")>Save</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+    <script type="text/javascript">
+        var isEmailConfirmed = "@Model.IsEmailConfirmed";
+
+        var labelAvatar = document.getElementById("label-avatar");
+        /** Activate the label for the avatar. */
+        function activateLabelAvatar() {
+            labelAvatar.classList.add("active");
+        }
+        /** Deactivate the label for the avatar. */
+        function deactivateLabelAvatar() {
+            labelAvatar.classList.remove("active");
+        };
+
+        // the user is not allowed to change the avatar if his/her email address has not been verified yet
+        var buttonChangeAvatar = document.getElementById("button-change-avatar");
+        if (buttonChangeAvatar != null && isEmailConfirmed == "False") {
+            buttonChangeAvatar.disabled = true;
+            buttonChangeAvatar.title = "Please verify your email address first.";
+        };
+
+        /** Open the file browser to select a file. */
+        function openFileBrowser() {
+            if (isEmailConfirmed != "False") {
+                document.getElementsByClassName("e-file-select-wrap")[0].querySelector("button").click();
+                return false;
+            }
+        };
+
+        // set the display name of input to the content of the label for the DOB
+        var labelDob = document.getElementById("label_date-picker-dob");
+        if (labelDob != null) {
+            labelDob.innerHTML = "@Html.DisplayNameFor(model => model.Input.DOB)";
+        };
+
+        var dobInputArea = document.getElementById("date-picker-dob");
+        var dobClearIcon = document.getElementById("dob-clear-icon");
+        if (dobInputArea != null && dobClearIcon != null) {
+            hideOrShowDobClearIcon();
+            dobInputArea.onblur = hideOrShowDobClearIcon;
+            dobClearIcon.onclick = clearDob;
+        }
+        /** Hide or show the clear icon for the DOB according to whether the DOB is null or not. */
+        function hideOrShowDobClearIcon() {
+            var dobValue = dobInputArea.ej2_instances[0].value;
+            if (dobValue != null) {
+                dobClearIcon.hidden = false;
+            } else {
+                dobClearIcon.hidden = true;
+            }
+        }
+        /** Clear the DOB and hide the clear icon for the DOB. */
+        function clearDob() {
+            dobInputArea.ej2_instances[0].value = null;
+            dobClearIcon.hidden = true;
+        };
+
+        var textBoxPhoneNumber = document.getElementById("Input_PhoneNumber");
+        if (textBoxPhoneNumber != null) {
+            addOrRemoveClassEmpty();
+            textBoxPhoneNumber.onfocus = function () {
+                textBoxPhoneNumber.classList.remove("empty");
+            }
+            textBoxPhoneNumber.onblur = addOrRemoveClassEmpty;
+        }
+        /** Add or remove the css class "empty" according to the value in the text box for the phone number. */
+        function addOrRemoveClassEmpty() {
+            if (textBoxPhoneNumber.value == "" || textBoxPhoneNumber.value == null) {
+                textBoxPhoneNumber.classList.add("empty");
+            } else {
+                textBoxPhoneNumber.classList.remove("empty");
+            }
+        };
+    </script>
+}

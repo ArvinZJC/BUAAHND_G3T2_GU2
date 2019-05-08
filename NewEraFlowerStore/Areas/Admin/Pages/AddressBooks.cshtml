@@ -1,0 +1,66 @@
+﻿@* the address book list page for an administrator *@
+@page
+
+@model AddressBooksModel
+
+@{
+    ViewData["Title"] = "Address Books";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.AddressBooks;
+    ViewData["AdminSiteMenuItem"] = "address books";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    if (Model.AddressBookForm.Count() > 0)
+    {
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "BookName", direction = "Ascending" }
+        };
+
+        <ejs-grid id="data-grid-address-books" allowFiltering="true" allowGrouping="true" allowPaging="true" allowSelection="true" allowSorting="true" dataSource="@Model.AddressBookForm" height="auto" locale="customised" toolbar="@(new List<string>() { "Search" })" width="auto">
+            <e-grid-filtersettings type="Excel"></e-grid-filtersettings>
+            <e-grid-groupsettings disablePageWiseAggregates="false"></e-grid-groupsettings>
+            <e-grid-pagesettings pageSize="5" pageSizes="true"></e-grid-pagesettings>
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="Id" headerText="ID" allowGrouping="false" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" width="100"></e-grid-column>
+                <e-grid-column field="BookName" headerText="Book name" allowGrouping="false" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="Username" headerText="Created by" clipMode="EllipsisWithTooltip" template="#template-show-avatar" width="200"></e-grid-column>
+                <e-grid-column field="FirstName" headerText="First name" allowGrouping="false" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="LastName" headerText="Last name" allowGrouping="false" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="DetailedAddress" headerText="Detailed address" allowGrouping="false" allowSorting="false" template="#template-show-entire-detailed-address" width="200"></e-grid-column>
+                <e-grid-column field="ZipOrPostalCode" headerText="Zip/postal code" allowGrouping="false" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="PhoneNumber" headerText="Phone number" allowFiltering="false" allowGrouping="false" allowSorting="false" clipMode="EllipsisWithTooltip" width="180"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script type="text/javascript">
+            // customise the message content of the grouping part of the data grid for listing address books
+            ej.base.L10n.load({
+                "customised": {
+                    "grid": {
+                        "GroupDropArea": "Drag the column header \"Created by\" here to group its column."
+                    }
+                }
+            });
+        </script>
+        <script type="text/x-jsrender" id="template-show-avatar">
+            <div class="e-avatar e-avatar-xsmall e-avatar-circle align-middle mr-2">
+                <img src="@Url.Content("~/img/avatars/${AvatarUrl}")" alt="Small Avatar" />
+            </div>
+            <span class="text-truncate">${Username}</span>
+        </script>
+        <script type="text/x-jsrender" id="template-show-entire-detailed-address">
+            <span class="text-wrap">${DetailedAddress}</span>
+        </script>
+    }
+    else
+    {
+        <div role="alert" class="alert alert-warning">Sorry! No address books found.</div>
+    }
+}

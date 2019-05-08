@@ -1,0 +1,147 @@
+﻿@* the login page *@
+@page
+
+@using Microsoft.AspNetCore.Identity
+
+@using NewEraFlowerStore.Data
+
+@model LoginModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Log In";
+    ViewData["StorePage"] = HeaderNavigation.Login;
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Account - log in</li>
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <h1 class="text-center">@ViewData["Title"]</h1>
+    <p class="text-justify">To log in, you need to <a asp-area="Identity" asp-page="/Account/Logout" class="text-decoration-none text-success">log out</a> first.</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md"></div>
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="text-center">@ViewData["Title"]</h1>
+                    <hr />
+                    <form asp-area="Identity" asp-page="/Account/Login" method="post">
+                        <div class="form-group">
+                            <div class="e-float-input e-success">
+                                <!-- set the type attribute value to "text" instead of "email" to float the relevant label correctly when the email address entered is invalid -->
+                                <input asp-for="Input.UsernameOrEmail" autofocus required />
+                                <span class="e-float-line"></span>
+                                <label asp-for="Input.UsernameOrEmail" class="e-float-text"></label>
+                            </div>
+                            <div class="e-control">
+                                <span asp-validation-for="Input.UsernameOrEmail" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="e-float-input e-input-group e-success">
+                                <input asp-for="Input.Password" required />
+                                <span class="e-float-line"></span>
+                                <label asp-for="Input.Password" class="e-float-text"></label>
+                                <span id="password-eye" class="e-input-group-icon fas fa-eye-slash" title="Click to show the password." onclick="hideOrShowPassword()"></span>
+                            </div>
+                            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+                            <ejs-tooltip id="tooltip-password" content="Please enter the correct password and notice:<br />1. At least 8 and at max 20 characters long.<br />2. At least 1 digit (0 - 9) and 1 letter.<br />3. No non-alphanumeric character." position="LeftBottom">
+                                <e-content-template>
+                                    <span asp-validation-for="Input.Password" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                                </e-content-template>
+                            </ejs-tooltip>
+                        </div>
+                        <div class="form-group row mb-0">
+                            <div class="col">
+                                <div class="e-float-input e-success">
+                                    <input asp-for="Input.Captcha" required />
+                                    <span class="e-float-line"></span>
+                                    <label asp-for="Input.Captcha" class="e-float-text"></label>
+                                </div>
+                            </div>
+                            <div class="col-auto d-flex align-items-center justify-content-center">
+                                <ejs-tooltip id="tooltip-captcha-image" content="Click to change the captcha image." position="RightCenter">
+                                    <e-content-template>
+                                        <img src="~/captcha/Image" alt="Captcha Image" id="image-captcha" style="cursor: pointer" onclick="reloadCaptchaImage()" />
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            </div>
+                        </div>
+                        <!-- the length here should be equal to the relevant attributes in the specified input model -->
+                        <ejs-tooltip id="tooltip-captcha" content="Please enter the captcha in the image and notice:<br />1. 4 characters long.<br />2. Only letters (except 'I', 'l', 'O', and 'o') and digits <br />(except 0 and 1) are accepted." position="LeftBottom">
+                            <e-content-template>
+                                <span asp-validation-for="Input.Captcha" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                            </e-content-template>
+                        </ejs-tooltip>
+                        <div class="form-group mt-3 d-flex justify-content-between">
+                            <label asp-for="Input.RememberMe" id="label-remember-me" class="mb-1" style="cursor: pointer"></label>
+                            <ejs-switch ejs-for="@Model.Input.RememberMe" id="Input_RememberMe"></ejs-switch>
+                        </div>
+                        <div class="form-group">
+                            <div role="alert" id="alert-remember-me" class="alert alert-warning px-2 py-1" hidden>
+                                <h4 class="alert-heading">Notes</h4>
+                                <p class="text-justify mb-0">With this switch button turned on, we will keep you logged in, making it easier to bid, buy, and manage. However, if you are using a public or shared device, please remember to disable it to protect your account.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success btn-block">OK</button>
+                        </div>
+                        <div class="form-group">
+                            <p>
+                                <a asp-area="Identity" asp-page="/Account/ForgotPassword" id="forgot-password" class="text-success text-decoration-none">Forgot your password?</a>
+                            </p>
+                            <label>Not a member yet? <a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-success text-decoration-none">Register</a>.</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md"></div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScripts" />
+        <script type="text/javascript">
+            /** Reload the captcha image. */
+            function reloadCaptchaImage() {
+                var dateAndTime = new Date();
+                document.getElementById("image-captcha").src = "/captcha/Image?code=" + dateAndTime.getDate() + (dateAndTime.getMonth() + 1) + dateAndTime.getYear() + dateAndTime.getHours() + dateAndTime.getMinutes() + dateAndTime.getSeconds() + dateAndTime.getMilliseconds();
+            };
+
+            var labelRememberMe = document.getElementById("label-remember-me");
+            if (labelRememberMe != null) {
+                labelRememberMe.addEventListener("mouseup", rippleHandler);
+                labelRememberMe.addEventListener("mousedown", rippleHandler);
+            }
+            /** Handle the ripple effect for a switch button with a label. */
+            function rippleHandler(e) {
+                let rippleSpan = this.nextElementSibling.querySelector('.e-ripple-container');
+                rippleSpan && ejs.buttons.rippleMouseHandler(e, rippleSpan);
+            };
+
+            var switchButtonRememberMe = document.getElementsByClassName("e-switch-wrapper")[0];
+            var alertRememberMe = document.getElementById("alert-remember-me");
+            if (switchButtonRememberMe != null && alertRememberMe != null) {
+                hideOrShowAlertRememberMe();
+                labelRememberMe.onclick = hideOrShowAlertRememberMe;
+                switchButtonRememberMe.onclick = hideOrShowAlertRememberMe;
+            }
+            /** Hide or show the notes for "Remember me" when the user clicks on the label or the switch button for "Remember me". */
+            function hideOrShowAlertRememberMe() {
+                switchButtonRememberMe = document.getElementsByClassName("e-switch-wrapper")[0];
+                if (switchButtonRememberMe.getAttribute("aria-checked") == "true") {
+                    alertRememberMe.hidden = false;
+                } else {
+                    alertRememberMe.hidden = true;
+                }
+            };
+        </script>
+    }
+}

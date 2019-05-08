@@ -1,0 +1,104 @@
+﻿@* the order list page for an administrator *@
+
+@page
+
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Orders";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Orders;
+    ViewData["AdminSiteMenuItem"] = "orders";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    if (Model.OrderForm.Count() > 0)
+    {
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "OrderTime", direction = "Descending" }
+        };
+
+        <ejs-grid id="data-grid-orders" allowFiltering="true" allowGrouping="true" allowPaging="true" allowSelection="true" allowSorting="true" dataSource="@Model.OrderForm" height="auto" load="formatDateTime" locale="customised" queryCellInfo="changeColumnContent" toolbar="@(new List<string>() { "Search" })" width="auto">
+            <e-grid-filtersettings type="Excel"></e-grid-filtersettings>
+            <e-grid-groupsettings disablePageWiseAggregates="false"></e-grid-groupsettings>
+            <e-grid-pagesettings pageSize="5" pageSizes="true"></e-grid-pagesettings>
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="Id" headerText="ID" allowGrouping="false" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" width="100"></e-grid-column>
+                <e-grid-column field="Username" clipMode="EllipsisWithTooltip" template="#template-show-avatar" width="200"></e-grid-column>
+                <e-grid-column field="OrderStatusId" headerText="Order status ID"></e-grid-column>
+                <e-grid-column field="OrderStatus" headerText="Order status" clipMode="EllipsisWithTooltip" template="#template-show-edit-button-accordingly" width="160"></e-grid-column>
+                <e-grid-column field="OrderTime" headerText="Order time" allowGrouping="false" clipMode="EllipsisWithTooltip" width="210"></e-grid-column>
+                <e-grid-column field="PaymentTime" headerText="Payment time" allowGrouping="false" clipMode="EllipsisWithTooltip" width="210"></e-grid-column>
+                <e-grid-column field="DeliveryTime" headerText="Delivery time" allowGrouping="false" clipMode="EllipsisWithTooltip" width="210"></e-grid-column>
+                <e-grid-column field="CompletionTime" headerText="Completion time" allowGrouping="false" clipMode="EllipsisWithTooltip" width="210"></e-grid-column>
+                <e-grid-column template="#template-allow-actions" width="60"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script type="text/javascript">
+            /** Format the date and time in the specified columns. */
+            function formatDateTime(args) {
+                var ordersDataGridArea = document.getElementById("data-grid-orders").ej2_instances[0];
+                for (var count = 0; count < ordersDataGridArea.columnModel.length; count++) {
+                    if (ordersDataGridArea.columnModel[count].field == "OrderTime" || ordersDataGridArea.columnModel[count].field == "PaymentTime" || ordersDataGridArea.columnModel[count].field == "DeliveryTime" || ordersDataGridArea.columnModel[count].field == "CompletionTime") {
+                        ordersDataGridArea.columnModel[count].format = { type: "datetime", format: "d MMMM yyyy HH:mm:ss" };
+                    }
+                }
+            };
+
+            // customise the message content of the grouping part of the data grid for listing orders
+            ej.base.L10n.load({
+                "customised": {
+                    "grid": {
+                        "GroupDropArea": "Drag the column header \"Username\" or \"Order status\" here to group its column. 2 column headers are also accepted."
+                    }
+                }
+            });
+
+            /** Hide or show the button for clearing a gender value according to whether the value is valid or not. */
+            function changeColumnContent(args) {
+                if (args.column.field === "OrderStatus" && args.data.OrderStatusId != 5 && args.data.OrderStatusId != 6 && args.data.OrderStatusId != 7 && args.data.OrderStatusId != 10) {
+                    args.cell.querySelector(".order-status-edit-button").classList.add("d-none");
+                }
+            };
+        </script>
+        <script type="text/x-jsrender" id="template-show-avatar">
+            <div class="e-avatar e-avatar-xsmall e-avatar-circle align-middle mr-2">
+                <img src="@Url.Content("~/img/avatars/${AvatarUrl}")" alt="Small Avatar" />
+            </div>
+            <span class="text-truncate">${Username}</span>
+        </script>
+        <script type="text/x-jsrender" id="template-show-edit-button-accordingly">
+            <div class="d-flex align-items-center">
+                <span class="text-truncate mr-2">${OrderStatus}</span>
+                <a role="button" href="@Url.Content("~/Admin/Orders/Status?id=${Id}")" class="btn text-success grid-action order-status-edit-button" title="Change order status.">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </div>
+        </script>
+        <script type="text/x-template" id="template-allow-actions">
+            <a role="button" href="@Url.Content("~/Admin/Orders/Details?id=${Id}")" class="btn text-success grid-action" title="View order details.">
+                <i class="far fa-list-alt"></i>
+            </a>
+        </script>
+    }
+    else
+    {
+        <div role="alert" class="alert alert-warning">Sorry! No orders found.</div>
+    }
+}
+
+@section Scripts { 
+    <script type="text/javascript">
+        var ordersDataGridArea = document.getElementById("data-grid-orders").ej2_instances[0];
+        if (ordersDataGridArea != null) {
+            ordersDataGridArea.hideColumns(["Order status ID"]); // hide the column with the column header "Order status ID"
+        };
+    </script>
+}

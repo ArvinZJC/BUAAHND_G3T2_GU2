@@ -1,0 +1,202 @@
+﻿@* the cart page *@
+@page
+
+@model CartModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Cart</li>
+}
+
+<h3 class="text-center mb-0">@ViewData["Title"]</h3>
+<hr />
+<partial name="_StatusMessage" for="StatusMessage" />
+<div role="alert" class="alert alert-warning text-justify" style="font-size: 14px">
+    <h6 class="alert-heading">Notes</h6>
+    <!-- the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code -->
+    <p class="text-justify mb-0">The cart can contain <b>at max 10 different bouquets</b>, and they are displayed in ascending order by the bouquet name. Remember to check out in time, or you may encounter a problem such as insufficient stocks, any bouquets off the shelves, and so on.</p>
+</div>
+
+@if (Model.IsEmailConfirmed)
+{
+    if (Model.MatchingCartDetailsCount > 0)
+    {
+        var count = 1;
+
+        @section Modal {
+            @foreach (var item in Model.MatchingCartDetailList)
+            {
+                @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                if (count++ > 10)
+                {
+                    break;
+                }
+
+                <div role="dialog" id="modal-removing-confirmation-@item.BouquetId" class="modal fade" tabindex="-1" aria-labelledby="modal-removing-confirmation-@item.BouquetId-title" aria-hidden="true">
+                    <div role="document" class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="modal-removing-confirmation-@item.BouquetId-title" class="modal-title">Removing Confirmation</h5>
+                                <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                            <div class="modal-body text-justify">Are you sure to remove the bouquet with the name "@item.Bouquet.Name" from the cart?</div>
+                            <div class="modal-footer">
+                                <form asp-page="/Cart" asp-page-handler="Remove" asp-route-bouquetId="@item.BouquetId" method="post">
+                                    <button type="submit" class="btn btn-warning">Yes</button>
+                                </form>
+                                <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div role="dialog" id="modal-removing-confirmation-all" class="modal fade" tabindex="-1" aria-labelledby="modal-removing-confirmation-all-title" aria-hidden="true">
+                <div role="document" class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="modal-removing-confirmation-all-title" class="modal-title">Removing Confirmation</h5>
+                            <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        </div>
+                        <div class="modal-body text-justify">Are you sure to remove all bouquets from the cart?</div>
+                        <div class="modal-footer">
+                            <form asp-page="/Cart" asp-page-handler="Remove" method="post">
+                                <button type="submit" class="btn btn-warning">Yes</button>
+                            </form>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        count = 1;
+
+        var subtotal = 0M;
+
+        foreach (var item in Model.MatchingCartDetailList)
+        {
+            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+            if (count++ > 10)
+            {
+                break;
+            }
+
+            var avaliableStocks = (item.Bouquet.Stocks - item.Quantity) >= 0 ? item.Bouquet.Stocks - item.Quantity : 0;
+            subtotal += DecimalHelper.ToPriceFormat(item.Bouquet.OriginalPrice * (1 - item.Bouquet.Discount)) * item.Quantity;
+
+            <div class="e-card rounded mb-3">
+                <div class="row">
+                    <div class="col-auto d-flex align-items-center">
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.BouquetId" class="e-avatar shadow-sm mx-2 my-2" style="font-size: 1.5rem" title="Click to turn to view details of the bouquet.">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + item.Bouquet.PhotoUrl1)" alt="Bouquet Photo" />
+                        </a>
+                    </div>
+                    <div class="col-md d-flex align-items-center">
+                        <div class="w-100 px-3" style="line-height: 1.3em">
+                            <div class="font-weight-bold text-truncate mt-2 mb-1">@item.Bouquet.Name</div>
+                            <div class="mb-1">&pound;@DecimalHelper.ToPriceFormat(item.Bouquet.OriginalPrice * (1 - item.Bouquet.Discount))</div>
+                        </div>
+                    </div>
+                    <div class="col d-flex align-items-center">
+                        <form asp-page="/Cart" method="post">
+                            <input type="hidden" name="bouquetId" value="@item.BouquetId" readonly />
+                            <ejs-tooltip id="tooltip-quantity-@item.BouquetId" content="1. At least 1, and at max the stocks of the bouquet.<br />2. The input will be automatically modified if invalid.">
+                                <e-content-template>
+                                    <ejs-numerictextbox id="text-box-quantity-@item.BouquetId" cssClass="e-success ml-3 mb-2" floatLabelType="Auto" format="n0" max="@item.Bouquet.Stocks" min="1" placeholder="QTY" value="@item.Quantity" Type="text" name="quantity"></ejs-numerictextbox>
+                                </e-content-template>
+                            </ejs-tooltip>
+                            <button type="submit" id="button-submit-quantity-@item.BouquetId" hidden>Confirm</button>
+                        </form>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        <div class="e-card-actions">
+                            <a class="rounded-circle text-success" style="padding-left: 7.5px; padding-right: 7.5px" title="Remove this bouquet from the cart." data-toggle="modal" data-target="#modal-removing-confirmation-@item.BouquetId">
+                                <i class="far fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="border rounded d-flex justify-content-end mb-3 px-2 py-2" style="font-size: 18px">
+            <span>Subtotal:&emsp;</span>
+            <span class="font-weight-bold">&pound;@DecimalHelper.ToPriceFormat(subtotal)</span>
+        </div>
+        <div class="row">
+            <div class="col-md mb-2">
+                @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                @if (Model.MatchingCartDetailsCount < 10)
+                {
+                    <a asp-page="/Bouquets/List" role="button" class="btn btn-success d-block d-md-inline-block">
+                        <i class="fas fa-angle-left pr-1"></i>
+                        <span>Continue shopping</span>
+                    </a>
+                }
+            </div>
+
+            @if (Model.MatchingCartDetailsCount > 1)
+            {
+                <div class="col-md text-center mb-2">
+                    <button type="button" class="btn btn-outline-success btn-block btn-md-inline-block" data-toggle="modal" data-target="#modal-removing-confirmation-all">
+                        <i class="far fa-trash-alt pr-1"></i>
+                        <span>Remove all</span>
+                    </button>
+                </div>
+            }
+
+            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+            @if (Model.MatchingCartDetailsCount <= 10)
+            {
+                <div class="col-md text-right">
+                    <form asp-page="/Cart" asp-page-handler="CheckOut" method="post">
+                        <button type="submit" class="btn btn-success btn-block btn-md-inline-block">
+                            <span>Check out</span>
+                            <i class="fas fa-angle-right pl-1"></i>
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <label>The cart is empty? <a asp-page="/Bouquets/List" class="text-success text-decoration-none">Shop now</a>.</label>
+    }
+}
+
+@section Scripts {
+    @if (Model.MatchingCartDetailsCount > 0)
+    {
+        var count = 1;
+
+        foreach (var item in Model.MatchingCartDetailList)
+        {
+            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+            if (count++ > 10)
+            {
+                break;
+            }
+
+            <script type="text/javascript">
+                var quantityInputArea = document.getElementById("text-box-quantity-@item.BouquetId");
+                if (quantityInputArea != null) {
+                    quantityInputArea.ej2_instances[0].change = function (args) {
+                        var buttonSubmitQuantity = document.getElementById("button-submit-quantity-@item.BouquetId");
+                        if (buttonSubmitQuantity != null && args.isInteracted) {
+                            buttonSubmitQuantity.click();
+                        }
+                    }
+                }
+            </script>
+        }
+    }
+}

@@ -1,0 +1,286 @@
+﻿@* the page for editing a bouquet *@
+@page
+
+@using Syncfusion.EJ2.Inputs
+
+@model EditModel
+
+@{
+    ViewData["Title"] = "Edit Bouquet";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Bouquets;
+    ViewData["AdminSiteMenuItem"] = "bouquets";
+    ViewData["AdminSiteFunction"] = "Edit";
+
+    UploaderAsyncSettings asyncSettingsForPhoto1 = new UploaderAsyncSettings { SaveUrl = @Url.Content("~/Bouquet/SavePhoto1Async?id=" + Model.Bouquet.ID), RemoveUrl = @Url.Content("~/Bouquet/DeletePhoto1Async?id=" + Model.Bouquet.ID) };
+    UploaderAsyncSettings asyncSettingsForPhoto2 = new UploaderAsyncSettings { SaveUrl = @Url.Content("~/Bouquet/SavePhoto2Async?id=" + Model.Bouquet.ID), RemoveUrl = @Url.Content("~/Bouquet/DeletePhoto2Async?id=" + Model.Bouquet.ID) };
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Admin" asp-page="/Bouquets/Index" class="text-decoration-none text-success">Admin - @ViewData["AdminSiteMenuItem"]</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<div role="alert" class="alert alert-warning" style="font-size: 12px">
+    <h6 class="alert-heading">Notes</h6>
+    <p class="text-justify mb-0">1. For each photo, only a JPG/JPEG/PNG image file less than 350 KB is accepted.</p>
+    <p class="text-justify mb-0">2. A square image larger than 800px*800px is suggested.</p>
+    <p class="text-justify mb-0">3. Internet Explorer is not supported.</p>
+</div>
+<label id="label-photo1" class="e-control item-title">Photo 1</label>
+<div class="row" onmouseover="activateLabelPhoto1()" onmouseout="deactivateLabelPhoto1()">
+    <div class="col-md-4">
+        <div class="row mb-2">
+            <div class="col-9 pr-0">
+                <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.PhotoUrl1)" class="img-fluid rounded" />
+            </div>
+            <div class="col-3">
+                <button type="button" id="button-change-photo1" class="btn btn-outline-success rounded-circle pt-1 pr-2 shadow" style="padding-left: 0.56rem !important" title="Change Photo 1." onclick="openFileBrowserForPhoto1()">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <ejs-uploader id="uploader-photo1" allowedExtensions=".jpg,.jpeg,.png" asyncSettings="@asyncSettingsForPhoto1" autoUpload="true" dropArea="none" locale="customised" maxFileSize="350000" multiple="false"></ejs-uploader>
+    </div>
+</div>
+<label id="label-photo2" class="e-control item-title">Photo 2</label>
+<div class="row" onmouseover="activateLabelPhoto2()" onmouseout="deactivateLabelPhoto2()">
+    <div class="col-md-4">
+        <div class="row mb-2">
+            <div class="col-9 pr-0">
+                <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.PhotoUrl2)" class="img-fluid rounded" />
+            </div>
+            <div class="col-3">
+                <button type="button" id="button-change-photo2" class="btn btn-outline-success rounded-circle pt-1 pr-2 shadow" style="padding-left: 0.56rem !important" title="Change Photo 2." onclick="openFileBrowserForPhoto2()">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <ejs-uploader id="uploader-photo2" allowedExtensions=".jpg,.jpeg,.png" asyncSettings="@asyncSettingsForPhoto2" autoUpload="true" dropArea="none" locale="customised" maxFileSize="350000" multiple="false"></ejs-uploader>
+    </div>
+</div>
+<hr class="mx-3" />
+<form asp-area="Admin" asp-page="/Bouquets/Edit" method="post">
+    <input type="hidden" asp-for="Bouquet.ID" readonly />
+    <div class="form-group">
+        <!-- the maximum length here should be equal to the relevant attributes in the specified model -->
+        <ejs-tooltip id="tooltip-name" content="At max 50 characters long." position="RightCenter">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Bouquet.Name" required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Bouquet.Name" class="e-float-text"></label>
+                </div>
+                <div>
+                    <span asp-validation-for="Bouquet.Name" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <input type="hidden" asp-for="Bouquet.PhotoUrl1" readonly />
+    <input type="hidden" asp-for="Bouquet.PhotoUrl2" readonly />
+    <div class="form-group card shadow-sm mb-4 p-2">
+        <!-- the maximum length here should be equal to the relevant attributes in the specified model -->
+        <ejs-tooltip id="tooltip-description" content="At max 800 characters long." position="RightCenter">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <textarea asp-for="Bouquet.Description" style="overflow-y: scroll" rows="5"></textarea>
+                    <span class="e-float-line"></span>
+                    <label asp-for="Bouquet.Description" class="e-float-text"></label>
+                </div>
+                <div>
+                    <span asp-validation-for="Bouquet.Description" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col pr-0">
+                <!-- the earlist date is the 1st day of the year 2018 when New Era Flower Store starts its own offline business -->
+                <ejs-datepicker ejs-for="@Model.Bouquet.LaunchDate" id="date-picker-launch-date" cssClass="e-success" allowEdit="false" floatLabelType="Auto" format="d MMMM yyyy" min="@DateTime.Parse("2018-1-1")" start="Decade" showTodayButton="false" name="Bouquet.LaunchDate"></ejs-datepicker>
+            </div>
+            <div class="col-auto d-flex align-items-center pl-0">
+                <i role="button" id="launch-date-clear-icon" class="close fas fa-times pl-2" style="cursor: pointer; font-size: 1rem" hidden></i>
+            </div>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Bouquet.LaunchDate" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <ejs-dropdownlist ejs-for="@Model.Bouquet.ColourId" id="dropdown-list-colour" cssClass="e-success" dataSource="@Model.ColourList" floatLabelType="Auto" placeholder="Colour" name="Bouquet.ColourId">
+            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+        </ejs-dropdownlist>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Bouquet.ColourId" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <ejs-dropdownlist ejs-for="@Model.Bouquet.FlowerId" id="dropdown-list-flower" cssClass="e-success" dataSource="@Model.FlowerList" floatLabelType="Auto" placeholder="Flower" name="Bouquet.FlowerId">
+            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+        </ejs-dropdownlist>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Bouquet.FlowerId" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <ejs-dropdownlist ejs-for="@Model.Bouquet.OccasionId" id="dropdown-list-occasion" cssClass="e-success" dataSource="@Model.OccasionList" floatLabelType="Auto" placeholder="Occasion" name="Bouquet.OccasionId">
+            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+        </ejs-dropdownlist>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Bouquet.OccasionId" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <p class="text-justify mt-4 mb-1">※ Please notice that the following fields would be set to their minimum values to prevent nullable inputs.</p>
+    <div class="form-group">
+        <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+        <ejs-tooltip id="tooltip-original-price" content="At least &pound;0.01 and at max &pound;999.99.">
+            <e-content-template>
+                <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                <ejs-numerictextbox ejs-for="@Model.Bouquet.OriginalPrice" id="text-box-original-price" cssClass="e-success" floatLabelType="Auto" format="n2" max="999.99" min="0.01" placeholder="@(Html.DisplayNameFor(model => model.Bouquet.OriginalPrice)) (&pound;)" step="0.01" Type="text" name="Bouquet.OriginalPrice"></ejs-numerictextbox>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+        <ejs-tooltip id="tooltip-discount" content="At least 0% (0) and at max 99% (0.99).">
+            <e-content-template>
+                <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                <ejs-numerictextbox ejs-for="@Model.Bouquet.Discount" id="text-box-discount" cssClass="e-success" floatLabelType="Auto" format="p0" max="0.99" min="0" placeholder="@(Html.DisplayNameFor(model => model.Bouquet.Discount))" step="0.01" Type="text" name="Bouquet.Discount"></ejs-numerictextbox>
+                <div>
+                    <span asp-validation-for="Bouquet.Discount" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <!-- the minumum value here should be equal to the relevant value in the back-end code -->
+        <ejs-tooltip id="tooltip-stocks" content="Only a non-negative integer is allowed in the input.">
+            <e-content-template>
+                <!-- the minumum value here should be equal to the relevant value in the back-end code -->
+                <ejs-numerictextbox ejs-for="@Model.Bouquet.Stocks" id="text-box-stocks" cssClass="e-success" floatLabelType="Auto" format="n0" min="0" placeholder="@(Html.DisplayNameFor(model => model.Bouquet.Stocks))" Type="text" name="Bouquet.Stocks"></ejs-numerictextbox>
+                <div>
+                    <span asp-validation-for="Bouquet.Stocks" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <input type="hidden" asp-for="Bouquet.Sales" readonly />
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" @(Model.IsEmailConfirmed ? string.Empty : "disabled")>Save</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+    <script type="text/javascript">
+        var isEmailConfirmed = "@Model.IsEmailConfirmed";
+
+        var labelPhoto1 = document.getElementById("label-photo1");
+        /** Activate the label for Photo 1. */
+        function activateLabelPhoto1() {
+            labelPhoto1.classList.add("active");
+        }
+        /** Deactivate the label for Photo 1. */
+        function deactivateLabelPhoto1() {
+            labelPhoto1.classList.remove("active");
+        };
+
+        var labelPhoto2 = document.getElementById("label-photo2");
+        /** Activate the label for Photo 2. */
+        function activateLabelPhoto2() {
+            labelPhoto2.classList.add("active");
+        }
+        /** Deactivate the label for Photo 2. */
+        function deactivateLabelPhoto2() {
+            labelPhoto2.classList.remove("active");
+        };
+
+        // the administrator is not allowed to change Photo 1 and Photo 2 if his/her email address has not been verified yet
+        var buttonChangePhoto1 = document.getElementById("button-change-photo1");
+        var buttonChangePhoto2 = document.getElementById("button-change-photo2");
+        if (buttonChangePhoto1 != null && buttonChangePhoto2 != null && isEmailConfirmed == "False") {
+            buttonChangePhoto1.disabled = true;
+            buttonChangePhoto2.disabled = true;
+            buttonChangePhoto1.title = "Please verify your email address first.";
+            buttonChangePhoto2.title = "Please verify your email address first.";
+        };
+
+        /** Open the file browser to select a file as Photo 1. */
+        function openFileBrowserForPhoto1() {
+            if (isEmailConfirmed != "False") {
+                document.getElementsByClassName("e-file-select-wrap")[0].querySelector("button").click();
+                return false;
+            }
+        };
+
+        /** Open the file browser to select a file as Photo 2. */
+        function openFileBrowserForPhoto2() {
+            if (isEmailConfirmed != "False") {
+                document.getElementsByClassName("e-file-select-wrap")[1].querySelector("button").click();
+                return false;
+            }
+        };
+
+        // set the display name of input to the content of the label for the launch date
+        var labelLaunchDate = document.getElementById("label_date-picker-launch-date");
+        if (labelLaunchDate != null) {
+            labelLaunchDate.innerHTML = "@Html.DisplayNameFor(model => model.Bouquet.LaunchDate)";
+        };
+
+        var launchDateInputArea = document.getElementById("date-picker-launch-date");
+        var launchDateClearIcon = document.getElementById("launch-date-clear-icon");
+        if (launchDateInputArea != null && launchDateClearIcon != null) {
+            if ("@Model.IsDefaultDateTime" == "True") {
+                clearLaunchDate();
+            }
+            hideOrShowLaunchDateClearIcon();
+            launchDateInputArea.onblur = hideOrShowLaunchDateClearIcon;
+            launchDateClearIcon.onclick = clearLaunchDate;
+        }
+        /** Hide or show the clear icon for the launch date according to whether the launch date is null or not. */
+        function hideOrShowLaunchDateClearIcon() {
+            var launchDateValue = launchDateInputArea.ej2_instances[0].value;
+            if (launchDateValue != null) {
+                launchDateClearIcon.hidden = false;
+            } else {
+                launchDateClearIcon.hidden = true;
+            }
+        }
+        /** Clear the launch date and hide the clear icon for the launch date. */
+        function clearLaunchDate() {
+            launchDateInputArea.ej2_instances[0].value = null;
+            launchDateClearIcon.hidden = true;
+        };
+
+        // prevent nullablue inputs in the text boxes for the original price, discount, and sales
+        var originalPriceInputArea = document.getElementById("text-box-original-price");
+        var discountInputArea = document.getElementById("text-box-discount");
+        var stocksInputArea = document.getElementById("text-box-stocks");
+        if (originalPriceInputArea != null && discountInputArea != null && stocksInputArea != null) {
+            originalPriceInputArea.onblur = function () {
+                if (originalPriceInputArea.ej2_instances[0].value == null) {
+                    originalPriceInputArea.ej2_instances[0].value = 0.01;
+                }
+            };
+            discountInputArea.onblur = function () {
+                if (discountInputArea.ej2_instances[0].value == null) {
+                    discountInputArea.ej2_instances[0].value = 0;
+                }
+            };
+            stocksInputArea.onblur = function () {
+                if (stocksInputArea.ej2_instances[0].value == null) {
+                    stocksInputArea.ej2_instances[0].value = 0;
+                }
+            };
+        }
+    </script>
+}

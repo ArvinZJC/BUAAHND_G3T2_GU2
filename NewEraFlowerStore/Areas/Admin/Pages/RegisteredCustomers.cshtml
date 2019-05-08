@@ -1,0 +1,138 @@
+﻿@* the registered customer list page *@
+@page
+
+@model RegisteredCustomersModel
+
+@{
+    ViewData["Title"] = "Registered Customers";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.RegisteredCustomers;
+    ViewData["AdminSiteMenuItem"] = "registered customers";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    if (Model.RegisteredCustomerForm.Count() > 0)
+    {
+        @section Modal { 
+            @foreach (var item in Model.RegisteredCustomerList)
+            {
+                <div role="dialog" id="modal-deleting-confirmation-@item.Id" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@item.Id-title" aria-hidden="true">
+                    <div role="document" class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="modal-deleting-confirmation-@item.Id-title" class="modal-title">Deleting Confirmation</h5>
+                                <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-justify">Are you sure to delete the customer account with the username "@item.UserName" permanently?</p>
+                                <p class="text-justify text-danger mb-0">Please notice that the customer account cannot be deleted if it contains at least 1 incomplete order.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form asp-area="Admin" asp-page="/RegisteredCustomers" asp-page-handler="Delete" asp-route-id="@item.Id" method="post">
+                                    <button type="submit" class="btn btn-warning">Yes</button>
+                                </form>
+                                <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "Username", direction = "Ascending" }
+        };
+
+        <ejs-grid id="data-grid-registered-customers" allowFiltering="true" allowPaging="true" allowSelection="true" allowSorting="true" dataSource="@Model.RegisteredCustomerForm" height="auto" load="formatDateTime" queryCellInfo="changeColumnContent" toolbar="@(new List<string>() { "Search" })" width="auto">
+            <e-grid-filtersettings type="Excel"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="5" pageSizes="true"></e-grid-pagesettings>
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="Id" headerText="ID" allowSorting="false" clipMode="EllipsisWithTooltip" width="100"></e-grid-column>
+                <e-grid-column field="Username" clipMode="EllipsisWithTooltip" template="#template-show-avatar" width="200"></e-grid-column>
+                <e-grid-column field="FirstName" headerText="First name" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="LastName" headerText="Last name" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="Email" clipMode="EllipsisWithTooltip" width="200"></e-grid-column>
+                <e-grid-column field="IsEmailConfirmed" headerText="Confirmed email" clipMode="EllipsisWithTooltip" template="#template-show-email-verification-status" width="100"></e-grid-column>
+                <e-grid-column field="Gender" clipMode="EllipsisWithTooltip" template="#template-show-gender-clear-button-accordingly" width="120"></e-grid-column>
+                <e-grid-column field="Dob" headerText="DOB" clipMode="EllipsisWithTooltip" width="160"></e-grid-column>
+                <e-grid-column field="PhoneNumber" headerText="Phone number" allowFiltering="false" allowSorting="false" clipMode="EllipsisWithTooltip" width="180"></e-grid-column>
+                <e-grid-column field="RegistrationTime" headerText="Registration time" clipMode="EllipsisWithTooltip" width="210"></e-grid-column>
+                <e-grid-column template="#template-allow-actions" width="60"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script type="text/javascript">
+            /** Format the date (and time) in the specified columns. */
+            function formatDateTime(args) {
+                var registeredCustomersDataGridArea = document.getElementById("data-grid-registered-customers").ej2_instances[0];
+                for (var count = 0; count < registeredCustomersDataGridArea.columnModel.length; count++) {
+                    if (registeredCustomersDataGridArea.columnModel[count].field == "Dob") {
+                        registeredCustomersDataGridArea.columnModel[count].format = { type: "date", format: "d MMMM yyyy" };
+                    }
+                    if (registeredCustomersDataGridArea.columnModel[count].field == "RegistrationTime") {
+                        registeredCustomersDataGridArea.columnModel[count].format = { type: "datetime", format: "d MMMM yyyy HH:mm:ss" };
+                    }
+                }
+            };
+
+            /** Change the content of specified columns according to specified conditions. */
+            function changeColumnContent(args) {
+                // change the background colour of the badge for showing email verification status according to the content of the badge
+                if (args.column.field === "IsEmailConfirmed") {
+                    if (args.cell.textContent === "Yes") {
+                        args.cell.querySelector(".email-verification-status").classList.add("badge-success");
+                    }
+                    if (args.cell.textContent === "No") {
+                        args.cell.querySelector(".email-verification-status").classList.add("badge-danger");
+                    }
+                }
+                // hide or show the button for clearing a gender value according to whether the value is valid or not.
+                if (args.column.field === "Gender") {
+                    if (args.data.Gender === "Male" || args.data.Gender === "Female" || args.data.Gender === "") {
+                        args.cell.querySelector(".gender-clear-button").classList.add("d-none");
+                    }
+                    else {
+                        args.cell.querySelector(".gender-value").classList.add("text-danger");
+                    }
+                }
+            };
+        </script>
+        <script type="text/x-jsrender" id="template-show-avatar">
+            <div class="e-avatar e-avatar-xsmall e-avatar-circle align-middle mr-2">
+                <img src="@Url.Content("~/img/avatars/${AvatarUrl}")" alt="Small Avatar" />
+            </div>
+            <span class="text-truncate">${Username}</span>
+        </script>
+        <script type="text/x-jsrender" id="template-show-email-verification-status">
+            <span class="badge badge-pill font-weight-light email-verification-status" style="font-size: 13px">${IsEmailConfirmed}</span>
+        </script>
+        <script type="text/x-jsrender" id="template-show-gender-clear-button-accordingly">
+            <div class="d-flex align-items-center">
+                <span class="text-truncate mr-2 gender-value">${Gender}</span>
+                <form class="gender-clear-button" action="@Url.Content("~/Admin/RegisteredCustomers?id=${Id}&handler=ClearInvalidGenderValue")" method="post">
+                    <button type="submit" class="btn text-success grid-action" title="Clear this invalid gender value.">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+        </script>
+        <script type="text/x-template" id="template-allow-actions">
+            <a role="button" class="btn text-success grid-action" title="Delete this customer account." data-toggle="modal" data-target="#modal-deleting-confirmation-${Id}">
+                <i class="far fa-trash-alt"></i>
+            </a>
+        </script>
+    }
+    else
+    {
+        <div role="alert" class="alert alert-warning">Sorry! No registered customers found.</div>
+    }
+}

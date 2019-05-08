@@ -1,0 +1,204 @@
+@* the header navigation partial view *@
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext StoreDbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var IsAdministrator = false;
+
+    if (user == null)
+    {
+        await SignInManager.SignOutAsync();
+    }
+    else
+    {
+        var userRoles = await UserManager.GetRolesAsync(user);
+        IsAdministrator = userRoles.Contains("Administrator");
+    }
+}
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light mb-3 px-0 py-0 border-bottom shadow fixed-top">
+    <a asp-page="/Index" class="navbar-brand ml-2 py-0" title="Click to turn to the home page of the store.">
+        <img asp-append-version="true" src="~/img/logo.jpg" alt="New Era Flower Store" height="40" />
+    </a>
+    <!-- the navigation bar collapses for RWD -->
+    <a role="button" id="navbar-menu" class="navbar-toggler border-0" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i id="navbar-menu-icon" class="fas fa-ellipsis-v text-black-50"></i>
+    </a>
+    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+        <!-- the navigation items for the cart and the user centre -->
+        <ul class="navbar-nav">
+            @if (user != null && SignInManager.IsSignedIn(User))
+            {
+                int matchingCartDetailsCount = 0;
+                int incompleteOrdersCount = 0;
+
+                if (IsAdministrator)
+                {
+                    <li class="nav-item">
+                        <a asp-area="Admin" asp-page="/Dashboard" role="button" class="btn btn-light rounded-0 nav-link flex-fill @HeaderNavigation.AdminSiteNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem" title="Click to turn to the admin site.">
+                            <i class="fas fa-chart-bar"></i>
+                            <!-- the text should be visible only on a mobile device -->
+                            <span class="d-sm-none px-1">Admin site</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    matchingCartDetailsCount = await StoreDbContext.CartDetails.Include(cartDetail => cartDetail.Bouquet).Include(cartDetail => cartDetail.User).Where(cartDetail => cartDetail.UserId == user.Id).CountAsync();
+                    incompleteOrdersCount = await StoreDbContext.Orders.Include(order => order.User).Where(order => order.UserId == user.Id && order.OrderStatusId != 9 && order.OrderStatusId != 11).CountAsync();
+
+                    <li class="nav-item">
+                        <a asp-page="/Cart" role="button" class="btn btn-light rounded-0 nav-link flex-fill @HeaderNavigation.CartNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem" title="Click to view your cart.">
+                            <i class="fas fa-shopping-cart"></i>
+                            <!-- the text should be visible only on a mobile device -->
+                            <span class="d-sm-none px-1">Cart</span>
+
+                            @if (matchingCartDetailsCount > 0)
+                            {
+                                <span class="badge badge-pill badge-success">@matchingCartDetailsCount</span>
+                            }
+                        </a>
+                    </li>
+                }
+
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <a role="button" class="btn btn-light rounded-0 nav-link dropdown-toggle @HeaderNavigation.UserCentreNavigationItem(ViewContext)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="e-avatar e-avatar-xsmall e-avatar-circle align-middle" style="@(IsAdministrator ? "background-color: #7171e4" : string.Empty)">
+                                @if (IsAdministrator)
+                                {
+                                    <span>@user.FirstName[0]@user.LastName[0]</span>
+                                }
+                                else
+                                {
+                                    <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + user.AvatarUrl)" alt="Small Avatar" />
+                                }
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right rounded-0 border-0 shadow">
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item @UserCentreMenu.UserCentreMenuItem(ViewContext)">
+                                <i class="fas fa-chalkboard-teacher pr-1"></i>
+                                <span><b>@user.UserName</b>'s user centre</span>
+                            </a>
+                            <a asp-area="Identity" asp-page="/Account/Manage/Profile" class="dropdown-item @UserCentreMenu.ProfileMenuItem(ViewContext)">
+                                <i class="fas fa-user pr-2"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="dropdown-item @UserCentreMenu.ChangePasswordMenuItem(ViewContext)">
+                                <i class="fas fa-unlock-alt pr-2"></i>
+                                <span>Change password</span>
+                            </a>
+
+                            @if (!IsAdministrator)
+                            {
+                                <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="dropdown-item @UserCentreMenu.AddressBooksMenuItem(ViewContext)">
+                                    <i class="fas fa-address-book pr-2"></i>
+                                    <span>Address books</span>
+                                </a>
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" class="dropdown-item d-flex align-items-center @UserCentreMenu.OrdersMenuItem(ViewContext)">
+                                    <i class="fas fa-file-alt" style="padding-right: 0.85rem"></i>
+                                    <span>Orders</span>
+
+                                    @if (incompleteOrdersCount > 0)
+                                    {
+                                        <span class="badge badge-pill ml-1 @(UserCentreMenu.OrdersMenuItem(ViewContext) == "active" ? "badge-light" : "badge-success")">@incompleteOrdersCount</span>
+                                    }
+                                </a>
+                                <a asp-area="Identity" asp-page="/Account/Manage/DeletePersonalData" class="dropdown-item @UserCentreMenu.DeactivateAccountMenuItem(ViewContext)">
+                                    <i class="fas fa-minus-circle" style="padding-right: 0.3rem"></i>
+                                    <span>Deactivate account</span>
+                                </a>
+                            }
+
+                            <div class="dropdown-divider mx-3"></div>
+                            <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt" style="padding-right: 0.3rem"></i>
+                                <span>Log out</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item d-flex justify-content-around">
+                    <a asp-area="Identity" asp-page="/Account/Register" role="button" class="btn btn-light rounded-0 nav-link flex-fill @HeaderNavigation.RegisterNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem">
+                        <i class="fas fa-user-plus pr-1"></i>
+                        <span>Register</span>
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Login" role="button" class="btn btn-light rounded-0 nav-link flex-fill @HeaderNavigation.LoginNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem">
+                        <i class="fas fa-sign-in-alt pr-1"></i>
+                        <span>Log in</span>
+                    </a>
+                </li>
+            }
+        </ul>
+        <!-- the other navigation items -->
+        <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+                <a asp-page="/Bouquets/List" role="button" class="btn btn-light rounded-0 nav-link flex-fill @HeaderNavigation.BouquetsNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem">Bouquets</a>
+            </li>
+            <!-- the flower navigation item should be hidden only on a mobile device -->
+            <li class="nav-item d-none d-md-block">
+                <div class="dropdown">
+                    <a role="button" class="btn btn-light rounded-0 nav-link dropdown-toggle @HeaderNavigation.FlowersNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flowers</a>
+                    <div class="dropdown-menu dropdown-menu-left rounded-0 border-0 shadow">
+                        @if (await StoreDbContext.Flowers.CountAsync() > 0)
+                        {
+                            <a asp-page="/Bouquets/List" asp-route-flowerId="-2" class="dropdown-item @BouquetCategoryMenu.FlowerMenuItem(ViewContext, "Best sellers")">Best sellers</a>
+                            <a asp-page="/Bouquets/List" asp-route-flowerId="-1" class="dropdown-item @BouquetCategoryMenu.FlowerMenuItem(ViewContext, "New arrivals")">New arrivals</a>
+                            <a asp-page="/Bouquets/List" asp-route-flowerId="0" class="dropdown-item @BouquetCategoryMenu.FlowerMenuItem(ViewContext, "Sale")">Sale</a>
+                            <div class="dropdown-divider mx-3"></div>
+
+                            @foreach (var item in await StoreDbContext.Flowers.ToListAsync())
+                            {
+                                <a asp-page="/Bouquets/List" asp-route-flowerId="@item.ID" class="dropdown-item @BouquetCategoryMenu.FlowerMenuItem(ViewContext, item.Name)">@item.Name</a>
+                            }
+                        }
+                        else
+                        {
+                            <h6 class="dropdown-header">Error! At least 1 flower type is required.</h6>
+                        }
+                    </div>
+                </div>
+            </li>
+            <!-- the occasion navigation item should be hidden only on a mobile device -->
+            <li class="nav-item d-none d-md-block">
+                <div class="dropdown">
+                    <a role="button" class="btn btn-light rounded-0 nav-link dropdown-toggle @HeaderNavigation.OccasionsNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Occasions</a>
+                    <div class="dropdown-menu dropdown-menu-left rounded-0 border-0 shadow">
+                        @if (await StoreDbContext.Occasions.CountAsync() > 0)
+                        {
+                            foreach (var item in StoreDbContext.Occasions.ToList())
+                            {
+                                <a asp-page="/Bouquets/List" asp-route-occasionId="@item.ID" class="dropdown-item @BouquetCategoryMenu.OccasionMenuItem(ViewContext, item.Name)">@item.Name</a>
+                            }
+                        }
+                        else
+                        {
+                            <h6 class="dropdown-header">Error! At least 1 occasion is required.</h6>
+                        }
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a role="button" class="btn btn-light rounded-0 nav-link dropdown-toggle @HeaderNavigation.HelpNavigationItem(ViewContext)" style="padding-top: 0.66rem; padding-bottom: 0.66rem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                    <div class="dropdown-menu dropdown-menu-left rounded-0 border-0 shadow">
+                        <a asp-page="/Help/Faq" class="dropdown-item @HelpMenu.FaqMenuItem(ViewContext)">FAQ</a>
+                        <a asp-page="/Help/PrivacyPolicy" class="dropdown-item @HelpMenu.PrivacyPolicyMenuItem(ViewContext)">Privacy policy</a>
+                        <a asp-page="/Help/UserAgreement" class="dropdown-item @HelpMenu.UserAgreementMenuItem(ViewContext)">User agreement</a>
+                        <a asp-page="/Help/AboutUs" class="dropdown-item @HelpMenu.AboutUsMenuItem(ViewContext)">About us</a>
+                        <a asp-page="/Help/ContactUs" class="dropdown-item @HelpMenu.ContactUsMenuItem(ViewContext)">Contact us</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>

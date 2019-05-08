@@ -1,0 +1,236 @@
+﻿@* the admin dashboard page *@
+@page
+
+@using System.Globalization
+@using Syncfusion.EJ2.Charts
+
+@model DashboardModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Dashboard;
+    ViewData["AdminSiteMenuItem"] = "dashboard";
+
+    var currentTime = DateTimeOffset.Now.ToLocalTime().DateTime;
+    var britainCultureInfo = new CultureInfo("en-GB");
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    <h6 id="registered-customers">
+        <i class="fas fa-chart-pie"></i>
+        <span>Statistics by <b>@(currentTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + currentTime.ToString("HH:mm:ss", britainCultureInfo))</b></span>
+    </h6>
+    <hr class="mx-3" />
+    <div class="row flex-sm-row-reverse">
+        <div class="col-md-3">
+            <div class="d-flex flex-column bg-light rounded shadow-sm mb-3">
+                <a href="#registered-customers" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent">Registered Customers</a>
+                <a href="#bouquets" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent">Bouquets</a>
+                <a href="#incomplete-orders" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent">Incomplete Orders</a>
+                <a href="#sales-amount" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent">Sales Amount</a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <p class="e-control font-weight-bold mb-2" style="font-size: 1.2rem">Registered Customers</p>
+            <p class="e-control text-muted text-justify mb-1" style="font-size: 1rem">
+                <span>From 1 December 2018 when the site starts to run, the number of registered customers that we have is</span>
+                <span class="text-dark font-weight-bold" style="font-size: 3rem">&nbsp;@Model.RegisteredCustomersCount</span>
+                <span>.</span>
+            </p>
+
+            @if (Model.RunningDays >= 28)
+            {
+                <p class="e-control text-muted text-justify mb-2" style="font-size: 1rem">The following bar chart shows the number of registered customers during the last week, the last 2 weeks, and the last 4 weeks.</p>
+                <ejs-chart id="chart-recently-registered-customers" title="Recently Registered Customers" height="350px">
+                    <e-chart-chartarea>
+                        <e-chartarea-border width="0"></e-chartarea-border>
+                    </e-chart-chartarea>
+                    <e-chart-primaryxaxis valueType="Category">
+                        <e-majorgridlines width="0"></e-majorgridlines>
+                    </e-chart-primaryxaxis>
+                    <e-chart-primaryyaxis visible="false"></e-chart-primaryyaxis>
+                    <e-chart-tooltipsettings enable="true"></e-chart-tooltipsettings>
+                    <e-series-collection>
+                        <e-series type="@ChartSeriesType.Column" dataSource="@Model.RecentlyRegisteredCustomersChart" xName="Category" yName="Count" width="2">
+                            <e-series-marker>
+                                <e-series-datalabel visible="true"></e-series-datalabel>
+                            </e-series-marker>
+                        </e-series>
+                    </e-series-collection>
+                </ejs-chart>
+            }
+
+            <div id="bouquets" class="d-flex justify-content-end mt-1 mb-5">
+                <a asp-area="Admin" asp-page="/RegisteredCustomers" class="text-success text-decoration-none">
+                    <span>Turn to the registered customer section</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+            <p class="e-control font-weight-bold mb-2" style="font-size: 1.2rem">Bouquets</p>
+            <p class="e-control text-muted text-justify mb-1" style="font-size: 1rem">Bouquets can be categoried by colour, flower, or occasion.</p>
+
+            @if (Model.ColoursCount > 0)
+            {
+                <ejs-accumulationchart id="chart-bouquets-sort-by-colour" title="Sort by Colour" enableAnimation="false">
+                    <e-accumulationchart-legendsettings visible="true"></e-accumulationchart-legendsettings>
+                    <e-accumulationchart-tooltipsettings enable="true"></e-accumulationchart-tooltipsettings>
+                    <e-accumulation-series-collection>
+                        <e-accumulation-series dataSource="@Model.SortByColourChart" xName="Name" yName="BouquetsCount" explode="true" explodeIndex="0" explodeOffset="10%">
+                            <e-accumulationseries-datalabel name="Name" position="Outside" visible="true"></e-accumulationseries-datalabel>
+                        </e-accumulation-series>
+                    </e-accumulation-series-collection>
+                </ejs-accumulationchart>
+            }
+            else
+            {
+                <p class="e-control text-danger text-center mb-2" style="font-size: 1rem">Error! At least 1 colour is required.</p>
+            }
+
+            @if (Model.FlowersCount > 0)
+            {
+                <ejs-accumulationchart id="chart-bouquets-sort-by-flower" title="Sort by Flower">
+                    <e-accumulationchart-legendsettings visible="true"></e-accumulationchart-legendsettings>
+                    <e-accumulationchart-tooltipsettings enable="true"></e-accumulationchart-tooltipsettings>
+                    <e-accumulation-series-collection>
+                        <e-accumulation-series dataSource="@Model.SortByFlowerChart" xName="Name" yName="BouquetsCount" innerRadius="20%" radius="Radius">
+                            <e-accumulationseries-datalabel name="Name" position="Outside" visible="true"></e-accumulationseries-datalabel>
+                        </e-accumulation-series>
+                    </e-accumulation-series-collection>
+                </ejs-accumulationchart>
+            }
+            else
+            {
+                <p class="e-control text-danger text-center mb-2" style="font-size: 1rem">Error! At least 1 flower is required.</p>
+            }
+
+            @if (Model.OccasionsCount > 0)
+            {
+                <ejs-accumulationchart id="chart-bouquets-sort-by-occasion" title="Sort by Occasion">
+                    <e-accumulationchart-legendsettings visible="true"></e-accumulationchart-legendsettings>
+                    <e-accumulationchart-tooltipsettings enable="true"></e-accumulationchart-tooltipsettings>
+                    <e-accumulation-series-collection>
+                        <e-accumulation-series dataSource="@Model.SortByOccasionChart" xName="Name" yName="BouquetsCount" explode="true" explodeIndex="3" explodeOffset="10%" innerRadius="40%" radius="70%">
+                            <e-accumulationseries-datalabel name="Name" position="Outside" visible="true"></e-accumulationseries-datalabel>
+                        </e-accumulation-series>
+                    </e-accumulation-series-collection>
+                </ejs-accumulationchart>
+            }
+            else
+            {
+                <p class="e-control text-danger text-center mb-1" style="font-size: 1rem">Error! At least 1 occasion is required.</p>
+            }
+
+            @if (Model.BouquetsSoldOutCount > 0)
+            {
+                <p class="e-control text-muted text-justify mb-1" style="font-size: 1rem">
+                    <span>It has been detected that the number of bouquets sold out is</span>
+                    <span class="text-danger font-weight-bold" style="font-size: 3rem">&nbsp;@Model.BouquetsSoldOutCount</span>
+                    <span>.</span>
+                </p>
+            }
+
+            <div id="incomplete-orders" class="d-flex justify-content-end mt-1 mb-5">
+                <a asp-area="Admin" asp-page="/Bouquets/Index" class="text-success text-decoration-none">
+                    <span>Turn to the bouquet section</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+            <p class="e-control font-weight-bold mb-2" style="font-size: 1.2rem">Incomplete Orders</p>
+            <ejs-grid id="data-grid-incomplete-orders" allowSelection="true" dataBound="autofitAllColumns" dataSource="@Model.IncompleteOrdersForm" height="auto" queryCellInfo="changeColumnContent" width="auto">
+                <e-grid-columns>
+                    <e-grid-column field="Failed" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 2).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Refunding" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 10).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Fulfillment" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 5).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Delivery" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 6).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Delivering" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 7).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Info" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 1).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Payment" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 4).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="Delivered" headerText="@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == 8).DisplayName" headerTextAlign="Left" textAlign="Right"></e-grid-column>
+                </e-grid-columns>
+            </ejs-grid>
+            <div id="sales-amount" class="d-flex justify-content-end mt-3 mb-5">
+                <a asp-area="Admin" asp-page="/Orders/Index" class="text-success text-decoration-none">
+                    <span>Turn to the order section</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+            <p class="e-control font-weight-bold mb-2" style="font-size: 1.2rem">Sales Amount</p>
+            <p class="e-control text-muted text-justify mb-1" style="font-size: 1rem">
+                <span>From 1 December 2018 when the site starts to run, our total sales amount is</span>
+                <span class="text-dark font-weight-bold" style="font-size: 3rem">&nbsp;&pound;@DecimalHelper.ToPriceFormat(Model.TotalSalesAmount)</span>
+                <span>.</span>
+            </p>
+
+            @if (Model.RunningMonths >= 1)
+            {
+                if (Model.HasRecentMonthsSalesAmountChart)
+                {
+                    <p class="e-control text-muted text-justify mb-2" style="font-size: 1rem">As for recent months' sales amount, there is a line chart as follows:</p>
+                    <ejs-chart id="chart-recent-months-sales-amount" title="Recent Months' Sales Amount" height="350px">
+                        <e-chart-chartarea>
+                            <e-chartarea-border width="0"></e-chartarea-border>
+                        </e-chart-chartarea>
+                        <e-chart-primaryxaxis valueType="DateTime" edgeLabelPlacement="Shift" intervalType="Months" labelFormat="MMMM yyyy">
+                            <e-majorgridlines width="0"></e-majorgridlines>
+                        </e-chart-primaryxaxis>
+                        <e-chart-primaryyaxis labelFormat="£{value}">
+                            <e-linestyle width="0"></e-linestyle>
+                            <e-majorticklines width="0"></e-majorticklines>
+                        </e-chart-primaryyaxis>
+                        <e-chart-tooltipsettings enable="true"></e-chart-tooltipsettings>
+                        <e-series-collection>
+                            <e-series type="@ChartSeriesType.Line" dataSource="@Model.RecentMonthsSalesAmountChart" xName="Month" yName="SalesAmount" opacity="1" width="2">
+                                <e-series-marker height="10" visible="true" width="10">
+                                    <e-series-datalabel visible="true"></e-series-datalabel>
+                                </e-series-marker>
+                            </e-series>
+                        </e-series-collection>
+                    </ejs-chart>
+                }
+                else
+                {
+                    <p class="e-control text-muted text-justify mb-1" style="font-size: 1rem">
+                        <span>For our first month (December 2018), our sales amount is</span>
+                        <span class="text-dark font-weight-bold" style="font-size: 1.5rem">&nbsp;&pound;@DecimalHelper.ToPriceFormat(Model.SalesAmount1)</span>
+                        <span>.</span>
+                    </p>
+                }
+            }
+
+            <div class="d-flex justify-content-end mt-1">
+                <a asp-area="Admin" asp-page="/Orders/Index" class="text-success text-decoration-none">
+                    <span>Turn to the sales record section</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+
+            <script type="text/javascript">
+                /** Autofit all columns of the data grid for showing statistics of incomplete orders. */
+                function autofitAllColumns(args) {
+                    this.autoFitColumns();
+                };
+
+                /** Change the text colour of specified columns according to specified conditions. */
+                function changeColumnContent(args) {
+                    if (args.column.field === "Failed" && args.data.Failed > 0) {
+                        args.cell.classList.add("font-weight-bold", "text-danger");
+                    }
+                    if (args.column.field === "Refunding" && args.data.Refunding > 0) {
+                        args.cell.classList.add("font-weight-bold", "text-danger");
+                    }
+                    if (args.column.field === "Fulfillment" && args.data.Fulfillment > 0) {
+                        args.cell.classList.add("font-weight-bold", "text-danger");
+                    }
+                    if (args.column.field === "Delivery" && args.data.Delivery > 0) {
+                        args.cell.classList.add("font-weight-bold", "text-danger");
+                    }
+                };
+            </script>
+        </div>
+    </div>
+}

@@ -1,0 +1,28 @@
+﻿@* the page for introducing the store *@
+@page
+
+@model AboutUsModel
+
+@{
+    ViewData["Title"] = "About Us";
+    ViewData["StorePage"] = HeaderNavigation.Help;
+    ViewData["HelpPage"] = HelpMenu.AboutUs;
+    ViewData["ReturnUrl"] = "~/Help/AboutUs";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Help - about us</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="carousel mb-3">
+    <div class="carousel-inner rounded">
+        <div class="carousel-item active">
+            <img asp-append-version="true" src="~/img/help/about_us.jpg" class="d-block w-100" alt="About Us">
+            <div class="carousel-caption cover-photo-title py-2">@ViewData["Title"]</div>
+        </div>
+    </div>
+</div>
+<div class="e-control bg-light rounded shadow-sm">
+    <p class="text-justify font-weight-bold mb-0 px-3 py-2" style="font-size: 16px">New Era Flower Store is a popular flower store brand owned by SHIELD Technology, Inc. Our stores are nearly everywhere. Our offline business was started on 1 January 2018 and we has achieved great success in providing wonderful bouquets and 5-star services. In order to make it much more convenient for customers to view, select, and purchase bouquets from the store, we have decided to start our own online business from 1 December 2018. We always believe that it is our duty to become the messenger of flowers.</p>
+</div>

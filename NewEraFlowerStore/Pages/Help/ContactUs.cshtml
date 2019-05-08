@@ -1,0 +1,30 @@
+﻿@* the page for detailing how to contact the store *@
+@page
+
+@model ContactUsModel
+
+@{
+    ViewData["Title"] = "Contact Us";
+    ViewData["StorePage"] = HeaderNavigation.Help;
+    ViewData["HelpPage"] = HelpMenu.ContactUs;
+    ViewData["ReturnUrl"] = "~/Help/ContactUs";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Help - contact us</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="carousel mb-3">
+    <div class="carousel-inner rounded">
+        <div class="carousel-item active">
+            <img asp-append-version="true" src="~/img/help/contact_us.jpg" class="d-block w-100" alt="Contact Us">
+            <div class="carousel-caption cover-photo-title py-2">@ViewData["Title"]</div>
+        </div>
+    </div>
+</div>
+<div class="e-control bg-light rounded shadow-sm px-3 py-2">
+    <p class="text-justify mb-0" style="font-size: 16px"><b>Email: </b>customerservice@shieldadmin.com</p>
+    <p class="text-justify mb-0" style="font-size: 16px"><b>Tel.: </b>0044 1234567890</p>
+    <p class="text-justify mb-0" style="font-size: 16px"><b>Fax: </b>0044 0987654321</p>
+</div>

@@ -1,0 +1,89 @@
+﻿@* the occasion list page *@
+@page
+
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Occasions";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Occasions;
+    ViewData["AdminSiteMenuItem"] = "occasions";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    <a asp-area="Admin" asp-page="/Occasions/Create" role="button" class="btn btn-success rounded-circle mb-3" title="Create an occasion.">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    if (Model.OccasionForm.Count > 0)
+    {
+        @section Modal {
+            @foreach (var item in Model.OccasionForm)
+            {
+                <div role="dialog" id="modal-deleting-confirmation-@item.ID" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@item.ID-title" aria-hidden="true">
+                    <div role="document" class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="modal-deleting-confirmation-@item.ID-title" class="modal-title">Deleting Confirmation</h5>
+                                <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-justify">Are you sure to delete the occasion with the name "@item.Name" permanently?</p>
+                                <p class="text-justify text-danger mb-0">Please notice that bouquets using it as the main occasion would be also deleted if you clicked "Yes".</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form asp-area="Admin" asp-page="/Occasions/Index" asp-page-handler="Delete" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-warning">Yes</button>
+                                </form>
+                                <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "Name", direction = "Ascending" }
+        };
+
+        <ejs-grid id="data-grid-occasions" allowFiltering="true" allowPaging="true" allowSelection="true" allowSorting="true" dataSource="@Model.OccasionForm" height="auto" toolbar="@(new List<string>() { "Search" })" width="auto">
+            <e-grid-filtersettings type="Excel"></e-grid-filtersettings>
+            <e-grid-pagesettings pageSize="5" pageSizes="true"></e-grid-pagesettings>
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="ID" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" width="100"></e-grid-column>
+                <e-grid-column field="Name" clipMode="EllipsisWithTooltip" width="150"></e-grid-column>
+                <e-grid-column field="Description" allowFiltering="false" allowSorting="false" template="#template-show-entire-description" width="200"></e-grid-column>
+                <e-grid-column headerText="Cover photo" template="#template-show-cover-photo" width="200"></e-grid-column>
+                <e-grid-column template="#template-allow-actions" width="100"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script type="text/x-jsrender" id="template-show-entire-description">
+            <span class="text-wrap">${Description}</span>
+        </script>
+        <script type="text/x-template" id="template-show-cover-photo">
+            <img src="@Url.Content("~/img/cover_photos/occasions/${CoverPhotoUrl}")" class="img-fluid rounded shadow-sm" />
+        </script>
+        <script type="text/x-template" id="template-allow-actions">
+            <a role="button" href="@Url.Content("~/Admin/Occasions/Edit?id=${ID}")" class="btn text-success grid-action mr-2" title="Edit this occasion.">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a role="button" class="btn text-success grid-action" title="Delete this occasion." data-toggle="modal" data-target="#modal-deleting-confirmation-${ID}">
+                <i class="far fa-trash-alt"></i>
+            </a>
+        </script>
+    }
+    else
+    {
+        <div role="alert" class="alert alert-warning">Sorry! No occasions found.</div>
+    }
+}

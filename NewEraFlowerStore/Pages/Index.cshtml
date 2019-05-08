@@ -1,0 +1,524 @@
+﻿@* the home page *@
+@page
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@model IndexModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Buy Wonderful Bouquets and Enjoy 5-star Services";
+    ViewData["ReturnUrl"] = "~/";
+
+    var searchDisabled = Model.BouquetsCount == 0 ? "disabled" : string.Empty;
+    var isSignedIn = SignInManager.IsSignedIn(User);
+    var cartDisabled = string.Empty;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-page="/Bouquets/List" method="get">
+    <div class="input-group my-3">
+        <input type="text" name="searchString" class="form-control" placeholder="Search for a bouquet" @searchDisabled />
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-success" @searchDisabled>
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+<!-- the home carousel should be hidden only on a mobile device -->
+<div id="homeCarousel" class="carousel slide d-none d-md-block" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li class="rounded-circle bg-dark border border-white active" data-target="#homeCarousel" data-slide-to="0"></li>
+        <li class="rounded-circle bg-dark border border-white" data-target="#homeCarousel" data-slide-to="1"></li>
+        <li class="rounded-circle bg-dark border border-white" data-target="#homeCarousel" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner rounded">
+        <div class="carousel-item active" data-interval="10000">
+            <img asp-append-version="true" src="~/img/carousel/home_carousel_image_1.jpg" class="d-block w-100" alt="Home Carousel Image 1">
+            <div class="carousel-caption rounded py-2">
+                <h3 class="mx-2">Must-have</h3>
+                <p class="text-center mx-2 mb-2">With fresh flowers from our fields, we are committed to providing you with expertly designed bouquets which have stood the test of time.</p>
+                <a asp-page="/Bouquets/List" asp-route-flowerId="-2" role="button" class="btn btn-success border border-white" title="View best sellers.">
+                    <span>Shop now</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="carousel-item" data-interval="10000">
+            <img asp-append-version="true" src="~/img/carousel/home_carousel_image_2.jpg" class="d-block w-100" alt="Home Carousel Image 2">
+            <div class="carousel-caption rounded py-2">
+                <h3 class="mx-2">Trendy</h3>
+                <p class="text-center mx-2 mb-2">Thanks to our floral experts, there are always something new to reflect seasonal, stylish bouquets.</p>
+                <a asp-page="/Bouquets/List" asp-route-flowerId="-1" role="button" class="btn btn-success border border-white" title="View new arrivals.">
+                    <span>Start to explore</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="carousel-item" data-interval="10000">
+            <img asp-append-version="true" src="~/img/carousel/home_carousel_image_3.jpg" class="d-block w-100" alt="Home Carousel Image 3">
+            <div class="carousel-caption rounded py-2">
+                <h3 class="mx-2">Value-added</h3>
+                <p class="text-center mx-2 mb-2">We always provide bouquets on sale. Minimal price, maximum impression.</p>
+                <a asp-page="/Bouquets/List" asp-route-flowerId="0" role="button" class="btn btn-success border border-white" title="View bouquets on sale.">
+                    <span>Have a look</span>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <a role="button" href="#homeCarousel" class="carousel-control-prev" data-slide="prev">
+        <span class="carousel-control-prev-icon fas fa-angle-left" aria-hidden="true"></span>
+    </a>
+    <a role="button" href="#homeCarousel" class="carousel-control-next" data-slide="next">
+        <span class="carousel-control-next-icon fas fa-angle-right" aria-hidden="true"></span>
+    </a>
+</div>
+<!-- the home media object should be visible only on a mobile device -->
+<a asp-page="/Bouquets/List" asp-route-flowerId="-2" class="media text-dark text-decoration-none bg-light rounded shadow-sm d-sm-none">
+    <div class="e-avatar shadow-sm mx-2 mt-2" style="font-size: 1.5rem">
+        <img asp-append-version="true" src="~/img/carousel/home_carousel_image_1.jpg" alt="Home Carousel Image 1">
+    </div>
+    <div class="media-body">
+        <h5 class="mt-2 mb-1">Must-have</h5>
+        <p class="text-justify mr-2 mb-2">Expertly designed bouquets have stood the test of time.</p>
+    </div>
+</a>
+<!-- the home media object should be visible only on a mobile device -->
+<a asp-page="/Bouquets/List" asp-route-flowerId="-1" class="media text-dark text-decoration-none bg-light rounded shadow-sm d-sm-none mt-2">
+    <div class="media-body mx-2">
+        <h5 class="mt-2 mb-1">Trendy</h5>
+        <p class="text-justify mb-2">Always something new to reflect seasonal, stylish bouquets.</p>
+    </div>
+    <div class="e-avatar shadow-sm mt-2 mr-2" style="font-size: 1.5rem">
+        <img asp-append-version="true" src="~/img/carousel/home_carousel_image_2.jpg" alt="Home Carousel Image 2">
+    </div>
+</a>
+<!-- the home media object should be visible only on a mobile device -->
+<a asp-page="/Bouquets/List" asp-route-flowerId="0" class="media text-dark text-decoration-none bg-light rounded shadow-sm d-sm-none mt-2">
+    <div class="e-avatar shadow-sm mx-2 mt-2" style="font-size: 1.5rem">
+        <img asp-append-version="true" src="~/img/carousel/home_carousel_image_3.jpg" alt="Home Carousel Image 3">
+    </div>
+    <div class="media-body">
+        <h5 class="mt-2 mb-1">Value-added</h5>
+        <p class="text-justify mr-2 mb-2">Some bouquets on sale. Minimal price, maximum impression.</p>
+    </div>
+</a>
+<div class="separator">
+    <span>Shop by Category</span>
+</div>
+<div class="row">
+    <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+        <a asp-page="/Bouquets/List" asp-route-flowerId="-2" class="text-dark text-decoration-none font-weight-bold">
+            <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                <img asp-append-version="true" src="~/img/cover_photos/flowers/-2.jpg" alt="Cover Photo" />
+            </div>
+            <div class="text-center">Best sellers</div>
+        </a>
+    </div>
+    <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+        <a asp-page="/Bouquets/List" asp-route-flowerId="-1" class="text-dark text-decoration-none font-weight-bold">
+            <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                <img asp-append-version="true" src="~/img/cover_photos/flowers/-1.jpg" alt="Cover Photo" />
+            </div>
+            <div class="text-center">New arrivals</div>
+        </a>
+    </div>
+    <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+        <a asp-page="/Bouquets/List" asp-route-flowerId="0" class="text-dark text-decoration-none font-weight-bold">
+            <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                <img asp-append-version="true" src="~/img/cover_photos/flowers/0.jpg" alt="Cover Photo" />
+            </div>
+            <div class="text-center">Sale</div>
+        </a>
+    </div>
+
+    @if (Model.FlowersCount >= 1 && Model.OccasionsCount >= 2)
+    {
+        <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+            <a asp-page="/Bouquets/List" asp-route-flowerId="@Model.FlowerList[0].ID" class="text-dark text-decoration-none font-weight-bold">
+                <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                    <img asp-append-version="true" src="@Url.Content("~/img/cover_photos/flowers/" + Model.FlowerList[0].CoverPhotoUrl)" alt="Cover Photo" />
+                </div>
+                <div class="text-center">@Model.FlowerList[0].Name</div>
+            </a>
+        </div>
+        <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+            <a asp-page="/Bouquets/List" asp-route-occasionId="@Model.OccasionList[0].ID" class="text-dark text-decoration-none font-weight-bold">
+                <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                    <img asp-append-version="true" src="@Url.Content("~/img/cover_photos/occasions/" + Model.OccasionList[0].CoverPhotoUrl)" alt="Cover Photo" />
+                </div>
+                <div class="text-center">@Model.OccasionList[0].Name</div>
+            </a>
+        </div>
+        <div class="col-4 col-md-2 d-flex justify-content-center mb-3">
+            <a asp-page="/Bouquets/List" asp-route-occasionId="@Model.OccasionList[1].ID" class="text-dark text-decoration-none font-weight-bold">
+                <div class="e-avatar e-avatar-circle shadow" style="font-size: 2rem">
+                    <img asp-append-version="true" src="@Url.Content("~/img/cover_photos/occasions/" + Model.OccasionList[1].CoverPhotoUrl)" alt="Cover Photo" />
+                </div>
+                <div class="text-center">@Model.OccasionList[1].Name</div>
+            </a>
+        </div>
+    }
+</div>
+<div class="d-flex justify-content-end">
+    <span class="text-muted">These do not suffice?&nbsp;</span>
+    <a asp-page="/Bouquets/List" class="text-success text-decoration-none">
+        <span>View all</span>
+        <i class="fas fa-angle-double-right"></i>
+    </a>
+</div>
+
+@if (Model.SaleCount > 0)
+{
+    var count = 1;
+
+    <div class="separator">
+        <span>Deals of the Day</span>
+    </div>
+    <div class="row">
+        @foreach (var item in Model.SaleList)
+        {
+            if (count <= (Model.SaleCount > 4 ? 4 : Model.SaleCount))
+            {
+                count++;
+
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="e-card rounded">
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="display-image" title="Click to view bouquet details.">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + item.PhotoUrl1)" class="d-block w-100" alt="Bouquet Photo" />
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (new TimeSpan(DateTime.Now.Ticks - item.LaunchDate.ToLocalTime().Ticks).TotalDays <= 14)
+                            {
+                                <span class="image-label left-label-success rounded shadow-sm">New</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <span class="image-label right-label-danger rounded shadow-sm">-@decimal.Truncate(item.Discount * 100)%</span>
+                            }
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-header text-decoration-none pb-0" title="Click to view bouquet details.">
+                            <div class="e-card-header-caption">
+                                <div class="e-card-header-title font-weight-bold" style="font-size: 15px">@item.Name</div>
+                            </div>
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-content text-justify text-decoration-none d-flex justify-content-between" style="font-size: 12px" title="Click to view bouquet details.">
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <div>
+                                    <span class="font-weight-bold" style="text-decoration-line: line-through">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                                    <span class="font-weight-bold text-danger">&nbsp;&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice * (1 - item.Discount))</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="font-weight-bold">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Sales >= 1000)
+                            {
+                                <ejs-tooltip id="tooltip-best-seller-@item.ID" content="999+ sales!" position="TopLeft">
+                                    <e-content-template>
+                                        <i class="fas fa-thumbs-up text-danger"></i>
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            }
+                        </a>
+
+                        @if (isSignedIn && !Model.IsAdministrator)
+                        {
+                            var avaliableStocks = item.Stocks;
+
+                            if (Model.MatchingCartDetails != null)
+                            {
+                                var existingCartDetail = await Model.MatchingCartDetails.FirstOrDefaultAsync(cartDetail => cartDetail.BouquetId == item.ID);
+
+                                if (existingCartDetail != null)
+                                {
+                                    avaliableStocks = (item.Stocks - existingCartDetail.Quantity) >= 0 ? item.Stocks - existingCartDetail.Quantity : 0;
+                                }
+                                else
+                                {
+                                    avaliableStocks = item.Stocks;
+                                }
+                            }
+
+                            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                            cartDisabled = (Model.IsEmailConfirmed && avaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? string.Empty : "disabled";
+
+                            @if (avaliableStocks > 0)
+                            {
+                                <form asp-page="/Cart" asp-page-handler="Add" asp-route-bouquetId="@item.ID" asp-route-quantity="1" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                                    <button type="submit" class="btn btn-success btn-block bouquet-card" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" @cartDisabled>
+                                        <i class="fas fa-cart-arrow-down"></i>
+                                        <span>Add to cart</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary btn-block" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" disabled>Sold out</button>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                break;
+            }
+        }
+    </div>
+
+    @if (Model.SaleCount > 4)
+    {
+        <div class="d-flex justify-content-end">
+            <a asp-page="/Bouquets/List" asp-route-flowerId="0" class="text-success text-decoration-none">
+                <span>View more</span>
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </div>
+    }
+}
+
+@if (Model.NewArrivalsCount > 0)
+{
+    var count = 1;
+
+    <div class="separator">
+        <span>Fresh & New</span>
+    </div>
+    <div class="row">
+        @foreach (var item in Model.NewArrivalList)
+        {
+            if (count <= (Model.NewArrivalsCount > 4 ? 4 : Model.NewArrivalsCount))
+            {
+                count++;
+
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="e-card rounded">
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="display-image" title="Click to view bouquet details.">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + item.PhotoUrl1)" class="d-block w-100" alt="Bouquet Photo" />
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (new TimeSpan(DateTime.Now.Ticks - item.LaunchDate.ToLocalTime().Ticks).TotalDays <= 14)
+                            {
+                                <span class="image-label left-label-success rounded shadow-sm">New</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <span class="image-label right-label-danger rounded shadow-sm">-@decimal.Truncate(item.Discount * 100)%</span>
+                            }
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-header text-decoration-none pb-0" title="Click to view bouquet details.">
+                            <div class="e-card-header-caption">
+                                <div class="e-card-header-title font-weight-bold" style="font-size: 15px">@item.Name</div>
+                            </div>
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-content text-justify text-decoration-none d-flex justify-content-between" style="font-size: 12px" title="Click to view bouquet details.">
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <div>
+                                    <span class="font-weight-bold" style="text-decoration-line: line-through">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                                    <span class="font-weight-bold text-danger">&nbsp;&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice * (1 - item.Discount))</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="font-weight-bold">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Sales >= 1000)
+                            {
+                                <ejs-tooltip id="tooltip-best-seller-@item.ID" content="999+ sales!" position="TopLeft">
+                                    <e-content-template>
+                                        <i class="fas fa-thumbs-up text-danger"></i>
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            }
+                        </a>
+
+                        @if (isSignedIn && !Model.IsAdministrator)
+                        {
+                            var avaliableStocks = item.Stocks;
+
+                            if (Model.MatchingCartDetails != null)
+                            {
+                                var existingCartDetail = await Model.MatchingCartDetails.FirstOrDefaultAsync(cartDetail => cartDetail.BouquetId == item.ID);
+
+                                if (existingCartDetail != null)
+                                {
+                                    avaliableStocks = (item.Stocks - existingCartDetail.Quantity) >= 0 ? item.Stocks - existingCartDetail.Quantity : 0;
+                                }
+                                else
+                                {
+                                    avaliableStocks = item.Stocks;
+                                }
+                            }
+
+                            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                            cartDisabled = (Model.IsEmailConfirmed && avaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? string.Empty : "disabled";
+
+                            @if (avaliableStocks > 0)
+                            {
+                                <form asp-page="/Cart" asp-page-handler="Add" asp-route-bouquetId="@item.ID" asp-route-quantity="1" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                                    <button type="submit" class="btn btn-success btn-block bouquet-card" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" @cartDisabled>
+                                        <i class="fas fa-cart-arrow-down"></i>
+                                        <span>Add to cart</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary btn-block" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" disabled>Sold out</button>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                break;
+            }
+        }
+    </div>
+
+    @if (Model.NewArrivalsCount > 4)
+    {
+        <div class="d-flex justify-content-end">
+            <a asp-page="/Bouquets/List" asp-route-flowerId="-1" class="text-success text-decoration-none">
+                <span>View more</span>
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </div>
+    }
+}
+
+@if (Model.BestSellersCount > 0)
+{
+    var count = 1;
+
+    <div class="separator">
+        <span>Most Popular</span>
+    </div>
+    <div class="row">
+        @foreach (var item in Model.BestSellerList)
+        {
+            if (count <= (Model.BestSellersCount > 4 ? 4 : Model.BestSellersCount))
+            {
+                count++;
+
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="e-card rounded">
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="display-image" title="Click to view bouquet details.">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + item.PhotoUrl1)" class="d-block w-100" alt="Bouquet Photo" />
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (new TimeSpan(DateTime.Now.Ticks - item.LaunchDate.ToLocalTime().Ticks).TotalDays <= 14)
+                            {
+                                <span class="image-label left-label-success rounded shadow-sm">New</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <span class="image-label right-label-danger rounded shadow-sm">-@decimal.Truncate(item.Discount * 100)%</span>
+                            }
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-header text-decoration-none pb-0" title="Click to view bouquet details.">
+                            <div class="e-card-header-caption">
+                                <div class="e-card-header-title font-weight-bold" style="font-size: 15px">@item.Name</div>
+                            </div>
+                        </a>
+                        <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-content text-justify text-decoration-none d-flex justify-content-between" style="font-size: 12px" title="Click to view bouquet details.">
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Discount > 0M)
+                            {
+                                <div>
+                                    <span class="font-weight-bold" style="text-decoration-line: line-through">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                                    <span class="font-weight-bold text-danger">&nbsp;&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice * (1 - item.Discount))</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="font-weight-bold">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                            }
+
+                            @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                            @if (item.Sales >= 1000)
+                            {
+                                <ejs-tooltip id="tooltip-best-seller-@item.ID" content="999+ sales!" position="TopLeft">
+                                    <e-content-template>
+                                        <i class="fas fa-thumbs-up text-danger"></i>
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            }
+                        </a>
+
+                        @if (isSignedIn && !Model.IsAdministrator)
+                        {
+                            var avaliableStocks = item.Stocks;
+
+                            if (Model.MatchingCartDetails != null)
+                            {
+                                var existingCartDetail = await Model.MatchingCartDetails.FirstOrDefaultAsync(cartDetail => cartDetail.BouquetId == item.ID);
+
+                                if (existingCartDetail != null)
+                                {
+                                    avaliableStocks = (item.Stocks - existingCartDetail.Quantity) >= 0 ? item.Stocks - existingCartDetail.Quantity : 0;
+                                }
+                                else
+                                {
+                                    avaliableStocks = item.Stocks;
+                                }
+                            }
+
+                            @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                            cartDisabled = (Model.IsEmailConfirmed && avaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? string.Empty : "disabled";
+
+                            @if (avaliableStocks > 0)
+                            {
+                                <form asp-page="/Cart" asp-page-handler="Add" asp-route-bouquetId="@item.ID" asp-route-quantity="1" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                                    <button type="submit" class="btn btn-success btn-block bouquet-card" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" @cartDisabled>
+                                        <i class="fas fa-cart-arrow-down"></i>
+                                        <span>Add to cart</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary btn-block" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" disabled>Sold out</button>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                break;
+            }
+        }
+    </div>
+
+    @if (Model.BestSellersCount > 4)
+    {
+        <div class="d-flex justify-content-end">
+            <a asp-page="/Bouquets/List" asp-route-flowerId="-2" class="text-success text-decoration-none font-weight-bold">
+                <span>View more</span>
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </div>
+    }
+}

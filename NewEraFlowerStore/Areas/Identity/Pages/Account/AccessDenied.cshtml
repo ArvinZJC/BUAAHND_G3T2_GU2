@@ -1,0 +1,13 @@
+﻿@* the page shown when administrators/customers do not have access to the specified page *@
+@page
+
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Account - access denied</li>
+}
+
+<h1 class="text-center text-danger">@ViewData["Title"]</h1>
+<p class="text-center">You do not have access to the specified page.</p>

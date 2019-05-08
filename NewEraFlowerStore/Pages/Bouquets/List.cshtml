@@ -1,0 +1,598 @@
+﻿@* the bouquet list page for all bouquets or matching bouquets according to the search string, price, colour, flower, and occasion *@
+@page
+
+@using System.Threading
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@model ListModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var searchDisabled = Model.BouquetsCount == 0 ? "disabled" : string.Empty;
+}
+
+@section Sidebar {
+    <!-- the bouquet filter sidebar should be visible only on a mobile device -->
+    <ejs-sidebar type="Over" id="sidebar-bouquet-filters" showBackdrop="true" class="sidebar d-flex flex-column align-items-center d-sm-none" style="max-width: 90%">
+        <e-content-template>
+            <div class="ml-auto mr-3" style="margin-top: 5.5rem">
+                <button type="button" id="bouquet-filter-sidebar-close-button" class="close">&times;</button>
+            </div>
+            <form asp-page="/Bouquets/List" method="get" class="mx-3 mt-5">
+                <input type="hidden" name="searchString" value="@Model.CurrentFilter" readonly />
+                <div class="form-group mb-2">
+                    <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                    <ejs-tooltip id="sidebar-tooltip-price" content="1. At least &pound;0.01 and at max &pound;999.99.<br />2. Both need values to enable the price filter.<br />3. The value in the left text box should be <br />lower or the same as that in the right one. <br />Otherwise, the price filter will have no effect.">
+                        <e-content-template>
+                            <div class="row">
+                                <div class="col">
+                                    <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                                    <ejs-numerictextbox ejs-for="@Model.CurrentLowestPrice" id="sidebar-text-box-lowest-price" cssClass="e-success" floatLabelType="Auto" format="n2" max="999.99" min="0.01" placeholder="From &pound;" Type="text" name="lowestPrice"></ejs-numerictextbox>
+                                </div>
+                                <div class="col">
+                                    <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                                    <ejs-numerictextbox ejs-for="@Model.CurrentHighestPrice" id="sidebar-text-box-highest-price" cssClass="e-success" floatLabelType="Auto" format="n2" max="999.99" min="0.01" placeholder="To &pound;" Type="text" name="highestPrice"></ejs-numerictextbox>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </ejs-tooltip>
+                </div>
+                <input type="hidden" name="colourId" value="@Model.CurrentColourId" readonly />
+                <input type="hidden" name="flowerId" value="@Model.CurrentFlowerId" readonly />
+                <input type="hidden" name="occasionId" value="@Model.CurrentOccasionId" readonly />
+                <button type="submit" class="btn btn-success btn-block">OK</button>
+            </form>
+            <div class="w-100 px-3 py-1">
+                <hr />
+            </div>
+            <form asp-page="/Bouquets/List" method="get" class="w-100 px-3">
+                <input type="hidden" name="searchString" value="@Model.CurrentFilter" readonly />
+                <input type="hidden" name="lowestPrice" value="@Model.CurrentLowestPrice" readonly />
+                <input type="hidden" name="highestPrice" value="@Model.CurrentHighestPrice" readonly />
+                <div class="form-group mb-4">
+                    <ejs-dropdownlist ejs-for="@Model.CurrentColourId" id="sidebar-dropdown-list-colour" cssClass="e-success" change="submitSidebarBouquetFilters" dataSource="@Model.ColourList" floatLabelType="Auto" placeholder="Colour" name="colourId">
+                        <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                </div>
+                <div class="form-group mb-4">
+                    <ejs-dropdownlist ejs-for="@Model.CurrentFlowerId" id="sidebar-dropdown-list-flower" cssClass="e-success mt-0" change="submitSidebarBouquetFilters" dataSource="@Model.FlowerList" floatLabelType="Auto" placeholder="Flower" name="flowerId">
+                        <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                </div>
+                <div class="form-group mb-0">
+                    <ejs-dropdownlist ejs-for="@Model.CurrentOccasionId" id="sidebar-dropdown-list-occasion" cssClass="e-success mt-0" change="submitSidebarBouquetFilters" dataSource="@Model.OccasionList" floatLabelType="Auto" placeholder="Occasion" name="occasionId">
+                        <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                </div>
+                <button type="submit" id="sidebar-button-submit-bouquet-filters" hidden>OK</button>
+            </form>
+            <div class="w-100 px-3 py-1">
+                <hr />
+            </div>
+            <div class="w-100 px-3">
+                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" role="button" class="btn btn-outline-success btn-block">Reset all</a>
+            </div>
+        </e-content-template>
+    </ejs-sidebar>
+}
+
+@section BreadcrumbItems {
+    @if (Model.CurrentFlowerId != null)
+    {
+        <li class="breadcrumb-item">
+            <a asp-page="/Bouquets/List" class="text-decoration-none text-success">Bouquets</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["FlowerPage"]</li>
+    }
+    else if (Model.CurrentOccasionId != null)
+    {
+        <li class="breadcrumb-item">
+            <a asp-page="/Bouquets/List" class="text-decoration-none text-success">Bouquets</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["OccasionPage"]</li>
+    }
+    else
+    {
+        <li class="breadcrumb-item active" aria-current="page">Bouquets</li>
+    }
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-page="/Bouquets/List" method="get">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search for a bouquet" value="@Model.CurrentFilter" @searchDisabled />
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-success" @searchDisabled>
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+
+@if (Model.BouquetsCount > 0)
+{
+    var textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
+    var coverPhotoUrl = string.Empty;
+    var coverPhotoTitle = string.Empty;
+    var description = string.Empty;
+
+    if (Model.CurrentFlowerId != null && Model.CurrentOccasionId == null)
+    {
+        switch (Model.CurrentFlowerId)
+        {
+            case -2:
+                coverPhotoUrl = "flowers/-2.jpg";
+                coverPhotoTitle = "Best Sellers";
+                description = "If you are looking to send a tried-and-true gift, you cannot go wrong" +
+                    " with sending flowers. Our bouquets with 999+ sales have stood the test of time" +
+                    " and are sure to delight, no matter the occasion.";
+                ViewData["FlowerPage"] = "Flowers - best sellers";
+                break;
+
+            case -1:
+                coverPhotoUrl = "flowers/-1.jpg";
+                coverPhotoTitle = "New Arrivals";
+                description = "Our selection of fresh new flowers is always changing to reflect the" +
+                    " most seasonal, stylish bouquets. So if you are looking for something trendy or" +
+                    " just something truly unique, look no further.";
+                ViewData["FlowerPage"] = "Flowers - new arrivals";
+                break;
+
+            case 0:
+                coverPhotoUrl = "flowers/0.jpg";
+                coverPhotoTitle = "Sale";
+                description = "Even with a minimal price, the impression can be maximum. These " +
+                    "discount bouquets still pack all the style, charm and freshness you have come " +
+                    "to expect from us. So go ahead, and save a few money. We will not tell.";
+                ViewData["FlowerPage"] = "Flowers - sale";
+                break;
+
+            default:
+                coverPhotoUrl = "flowers/" + Model.CurrentFlower.CoverPhotoUrl;
+                coverPhotoTitle = textInfo.ToTitleCase(Model.CurrentFlower.Name);
+                description = Model.CurrentFlower.Description;
+                ViewData["FlowerPage"] = "Flowers - " + Model.CurrentFlower.Name.ToLower();
+                break;
+        }
+
+        ViewData["Title"] = coverPhotoTitle + " - Bouquets";
+        ViewData["StorePage"] = HeaderNavigation.Flowers;
+        ViewData["ReturnUrl"] = "~/Bouquets/List?flowerId=" + Model.CurrentFlowerId;
+    }
+    else if (Model.CurrentFlowerId == null && Model.CurrentOccasionId != null)
+    {
+        coverPhotoUrl = "occasions/" + Model.CurrentOccasion.CoverPhotoUrl;
+        coverPhotoTitle = textInfo.ToTitleCase(Model.CurrentOccasion.Name);
+        description = Model.CurrentOccasion.Description;
+        ViewData["Title"] = coverPhotoTitle + " - Bouquets";
+        ViewData["StorePage"] = HeaderNavigation.Occasions;
+        ViewData["OccasionPage"] = "Occasions - " + Model.CurrentOccasion.Name.ToLower();
+        ViewData["ReturnUrl"] = "~/Bouquets/List?occasionId=" + Model.CurrentOccasionId;
+    }
+    else
+    {
+        coverPhotoUrl = "flowers/all.jpg";
+
+        if (string.IsNullOrWhiteSpace(Model.CurrentFilter)
+            && Model.CurrentLowestPrice == null
+            && Model.CurrentHighestPrice == null
+            && Model.CurrentColourId == null
+            && Model.CurrentFlowerId == null
+            && Model.CurrentOccasionId == null)
+        {
+            coverPhotoTitle = "All Bouquets";
+        }
+        else
+        {
+            coverPhotoTitle = "All Matching Bouquets";
+        }
+
+        ViewData["Title"] = "Bouquets";
+        ViewData["StorePage"] = HeaderNavigation.Bouquets;
+        ViewData["ReturnUrl"] = "~/Bouquets/List?currentFilter="
+            + Model.CurrentFilter
+            + "&lowestPrice="
+            + Model.CurrentLowestPrice
+            + "&highestPrice="
+            + Model.CurrentHighestPrice
+            + "&colourId="
+            + Model.CurrentColourId
+            + "&flowerId="
+            + Model.CurrentFlowerId
+            + "&occasionId="
+            + Model.CurrentOccasionId;
+    }
+
+    <!-- the flower/occasion cover photo should be hidden only on a mobile device -->
+    <div class="carousel d-none d-md-block mt-3">
+        <div class="carousel-inner rounded">
+            <div class="carousel-item active">
+                <img asp-append-version="true" src="@Url.Content("~/img/cover_photos/" + coverPhotoUrl)" class="d-block w-100" alt="Cover Photo">
+                <div class="carousel-caption cover-photo-title py-2">@coverPhotoTitle</div>
+            </div>
+        </div>
+    </div>
+    <!-- the page title and the button for hiding or toggling the bouquet flter menu should be visible only on a mobile device -->
+    <div class="row d-sm-none mt-4">
+        <div class="col-auto d-flex align-items-center pr-0">
+            <a role="button" id="bouquet-filter-menu" class="btn border-0" title="Click to show bouquet filters.">
+                <i class="fas fa-bars text-black-50"></i>
+            </a>
+            <span class="e-badge e-badge-notification e-badge-overlap bg-success text-white ml-3" style="width: 5.1rem">Click me!</span>
+        </div>
+        <div class="col pl-0">
+            <h5 class="text-center mb-0 pt-1">@coverPhotoTitle</h5>
+        </div>
+    </div>
+    <!-- the horizontal rule should be visible only on a mobile device -->
+    <hr class="d-sm-none" />
+    <div class="row mt-3">
+        <!-- the bouquet filter navigation should be hidden only on a mobile device -->
+        <div class="col-md-3 d-none d-md-block">
+            <div class="bg-light rounded shadow px-3 py-3">
+                <form asp-page="/Bouquets/List" method="get">
+                    <input type="hidden" name="searchString" value="@Model.CurrentFilter" readonly />
+                    <div class="form-group mb-2">
+                        <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                        <ejs-tooltip id="tooltip-price" content="1. At least &pound;0.01 and at max &pound;999.99.<br />2. Both need values to enable the price filter.<br />3. The value in the left text box should be <br />lower or the same as that in the right one. <br />Otherwise, the price filter will have no effect.">
+                            <e-content-template>
+                                <div class="row">
+                                    <div class="col">
+                                        <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                                        <ejs-numerictextbox ejs-for="@Model.CurrentLowestPrice" id="text-box-lowest-price" cssClass="e-success" floatLabelType="Auto" format="n2" max="999.99" min="0.01" placeholder="From &pound;" Type="text" name="lowestPrice"></ejs-numerictextbox>
+                                    </div>
+                                    <div class="col">
+                                        <!-- the minumum and maximum values here should be equal to the relevant values in the back-end code -->
+                                        <ejs-numerictextbox ejs-for="@Model.CurrentHighestPrice" id="text-box-highest-price" cssClass="e-success" floatLabelType="Auto" format="n2" max="999.99" min="0.01" placeholder="To &pound;" Type="text" name="highestPrice"></ejs-numerictextbox>
+                                    </div>
+                                </div>
+                            </e-content-template>
+                        </ejs-tooltip>
+                    </div>
+                    <input type="hidden" name="colourId" value="@Model.CurrentColourId" readonly />
+                    <input type="hidden" name="flowerId" value="@Model.CurrentFlowerId" readonly />
+                    <input type="hidden" name="occasionId" value="@Model.CurrentOccasionId" readonly />
+                    <button type="submit" class="btn btn-success btn-block">OK</button>
+                </form>
+                <div class="w-100 py-1">
+                    <hr />
+                </div>
+                <form asp-page="/Bouquets/List" method="get" class="w-100">
+                    <input type="hidden" name="searchString" value="@Model.CurrentFilter" readonly />
+                    <input type="hidden" name="lowestPrice" value="@Model.CurrentLowestPrice" readonly />
+                    <input type="hidden" name="highestPrice" value="@Model.CurrentHighestPrice" readonly />
+                    <div class="form-group mb-4">
+                        <ejs-dropdownlist ejs-for="@Model.CurrentColourId" id="dropdown-list-colour" cssClass="e-success" change="submitBouquetFilters" dataSource="@Model.ColourList" floatLabelType="Auto" placeholder="Colour" name="colourId">
+                            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                        </ejs-dropdownlist>
+                    </div>
+                    <div class="form-group mb-4">
+                        <ejs-dropdownlist ejs-for="@Model.CurrentFlowerId" id="dropdown-list-flower" cssClass="e-success mt-0" change="submitBouquetFilters" dataSource="@Model.FlowerList" floatLabelType="Auto" placeholder="Flower" name="flowerId">
+                            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                        </ejs-dropdownlist>
+                    </div>
+                    <div class="form-group mb-0">
+                        <ejs-dropdownlist ejs-for="@Model.CurrentOccasionId" id="dropdown-list-occasion" cssClass="e-success mt-0" change="submitBouquetFilters" dataSource="@Model.OccasionList" floatLabelType="Auto" placeholder="Occasion" name="occasionId">
+                            <e-dropdownlist-fields text="Name" value="ID"></e-dropdownlist-fields>
+                        </ejs-dropdownlist>
+                    </div>
+                    <button type="submit" id="button-submit-bouquet-filters" hidden>OK</button>
+                </form>
+                <div class="w-100 py-1">
+                    <hr />
+                </div>
+                <div class="w-100">
+                    <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" role="button" class="btn btn-outline-success btn-block">Reset all</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            @if (Model.MatchingBouquetsCount > 0 && Model.CurrentPageIndex <= Model.MatchingBouquetList.TotalPages)
+            {
+                var sortOrderDisplayName = string.Empty;
+                var nameAscendingStatus = string.Empty;
+                var nameDescendingStatus = string.Empty;
+                var priceAscendingStatus = string.Empty;
+                var priceDescendingStatus = string.Empty;
+                var salesAscendingStatus = string.Empty;
+                var salesDescendingStatus = string.Empty;
+                var launchDateAscendingStatus = string.Empty;
+                var launchDateDescendingStatus = string.Empty;
+                var cartDisabled = string.Empty;
+                var noPreviousPage = !Model.MatchingBouquetList.HasPreviousPage ? "true" : "false";
+                var noNextPage = !Model.MatchingBouquetList.HasNextPage ? "true" : "false";
+                var previousPageDisabled = !Model.MatchingBouquetList.HasPreviousPage ? "disabled" : string.Empty;
+                var nextPageDisabled = !Model.MatchingBouquetList.HasNextPage ? "disabled" : string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(description))
+                {
+                    <div class="e-control bg-light rounded shadow-sm">
+                        <p class="text-justify font-weight-bold px-3 py-2" style="font-size: 14px">@description</p>
+                    </div>
+                }
+
+                switch (Model.CurrentSortOrder)
+                {
+                    case "name_descending":
+                        sortOrderDisplayName = "name descending";
+                        nameDescendingStatus = "active";
+                        break;
+
+                    case "price_ascending":
+                        sortOrderDisplayName = "price: low to high";
+                        priceAscendingStatus = "active";
+                        break;
+
+                    case "price_descending":
+                        sortOrderDisplayName = "price: high to low";
+                        priceDescendingStatus = "active";
+                        break;
+
+                    case "sales_ascending":
+                        sortOrderDisplayName = "sales: small to large";
+                        salesAscendingStatus = "active";
+                        break;
+
+                    case "sales_descending":
+                        sortOrderDisplayName = "sales: large to small";
+                        salesDescendingStatus = "active";
+                        break;
+
+                    case "launchDate_ascending":
+                        sortOrderDisplayName = "launch date: early to late";
+                        launchDateAscendingStatus = "active";
+                        break;
+
+                    case "launchDate_descending":
+                        sortOrderDisplayName = "launch date: late to early";
+                        launchDateDescendingStatus = "active";
+                        break;
+
+                    default:
+                        sortOrderDisplayName = "name ascending";
+                        nameAscendingStatus = "active";
+                        break;
+                }
+
+                <nav class="navbar navbar-light bg-light d-flex justify-content-end mb-3 px-0 py-0 shadow-sm">
+                    <div class="dropdown">
+                        <a role="button" class="btn btn-light rounded nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort by <b>@sortOrderDisplayName</b></a>
+                        <div class="dropdown-menu dropdown-menu-right rounded-0 border-0 shadow">
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @nameAscendingStatus">name ascending</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="name_descending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @nameDescendingStatus">name descending</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="price_ascending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @priceAscendingStatus">price: low to high</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="price_descending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @priceDescendingStatus">price: high to low</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="sales_ascending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @salesAscendingStatus">sales: small to large</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="sales_descending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @salesDescendingStatus">sales: large to small</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="launchDate_ascending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @launchDateAscendingStatus">launch date: early to late</a>
+                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="launchDate_descending" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" class="dropdown-item @launchDateDescendingStatus">launch date: late to early</a>
+                        </div>
+                    </div>
+                </nav>
+                <div class="row">
+                    @foreach (var item in Model.MatchingBouquetList)
+                    {
+                        <div class="col-6 col-md-4 mb-3">
+                            <div class="e-card rounded">
+                                <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="display-image" title="Click to view bouquet details.">
+                                    <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + item.PhotoUrl1)" class="d-block w-100" alt="Bouquet Photo" />
+
+                                    @* the value in the condition should be equal to the relevant value in the back-end code *@
+                                    @if (new TimeSpan(DateTime.Now.Ticks - item.LaunchDate.ToLocalTime().Ticks).TotalDays <= 14)
+                                    {
+                                        <span class="image-label left-label-success rounded shadow-sm">New</span>
+                                    }
+
+                                    @* the value in the condition should be equal to the relevant value in the back-end code *@
+                                    @if (item.Discount > 0M)
+                                    {
+                                        <span class="image-label right-label-danger rounded shadow-sm">-@decimal.Truncate(item.Discount * 100)%</span>
+                                    }
+                                </a>
+                                <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-header text-decoration-none pb-0" title="Click to view bouquet details.">
+                                    <div class="e-card-header-caption">
+                                        <div class="e-card-header-title font-weight-bold" style="font-size: 15px">@item.Name</div>
+                                    </div>
+                                </a>
+                                <a asp-page="/Bouquets/Details" asp-route-id="@item.ID" class="e-card-content text-justify text-decoration-none d-flex justify-content-between" style="font-size: 12px" title="Click to view bouquet details.">
+                                    @* the value in the condition should be equal to the relevant value in the back-end code *@
+                                    @if (item.Discount > 0M)
+                                    {
+                                        <div>
+                                            <span class="font-weight-bold" style="text-decoration-line: line-through">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                                            <span class="font-weight-bold text-danger">&nbsp;&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice * (1 - item.Discount))</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="font-weight-bold">&pound;@DecimalHelper.ToPriceFormat(item.OriginalPrice)</span>
+                                    }
+
+                                    @* the value in the condition should be equal to the relevant value in the back-end code *@
+                                    @if (item.Sales >= 1000)
+                                    {
+                                        <ejs-tooltip id="tooltip-best-seller-@item.ID" content="999+ sales!" position="TopLeft">
+                                            <e-content-template>
+                                                <i class="fas fa-thumbs-up text-danger"></i>
+                                            </e-content-template>
+                                        </ejs-tooltip>
+                                    }
+                                </a>
+
+                                @if (SignInManager.IsSignedIn(User) && !Model.IsAdministrator)
+                                {
+                                    var avaliableStocks = item.Stocks;
+
+                                    if (Model.MatchingCartDetails != null)
+                                    {
+                                        var existingCartDetail = await Model.MatchingCartDetails.FirstOrDefaultAsync(cartDetail => cartDetail.BouquetId == item.ID);
+
+                                        if (existingCartDetail != null)
+                                        {
+                                            avaliableStocks = (item.Stocks - existingCartDetail.Quantity) >= 0 ? item.Stocks - existingCartDetail.Quantity : 0;
+                                        }
+                                        else
+                                        {
+                                            avaliableStocks = item.Stocks;
+                                        }
+                                    }
+
+                                    @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                                    cartDisabled = (Model.IsEmailConfirmed && avaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? string.Empty : "disabled";
+
+                                    @if (avaliableStocks > 0)
+                                    {
+                                        <form asp-page="/Cart" asp-page-handler="Add" asp-route-bouquetId="@item.ID" asp-route-quantity="1" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                                            <button type="submit" class="btn btn-success btn-block bouquet-card" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" @cartDisabled>
+                                                <i class="fas fa-cart-arrow-down"></i>
+                                                <span>Add to cart</span>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-block" style="color: #fff; padding-top: 0.375rem; border-top-left-radius: 0; border-top-right-radius: 0" disabled>Sold out</button>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="d-md-flex justify-content-md-between">
+                    <nav>
+                        <ul class="pagination d-flex justify-content-between mb-0">
+                            <li class="page-item mr-2 @previousPageDisabled">
+                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="1" class="page-link e-icons icon-first d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the first page."></a>
+                            </li>
+                            <li class="page-item mr-2 @previousPageDisabled">
+                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@(Model.MatchingBouquetList.PageIndex - 1)" class="page-link e-icons icon-previous d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the previous page."></a>
+                            </li>
+
+                            @if (Model.MatchingBouquetList.TotalPages <= 10)
+                            {
+                                for (var count = 1; count <= Model.MatchingBouquetList.TotalPages; count++)
+                                {
+                                    <!-- the page index buttons should be hidden only on a mobile device -->
+                                    <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingBouquetList.PageIndex ? "active" : string.Empty)">
+                                        <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                if (Model.MatchingBouquetList.PageIndex == 1)
+                                {
+                                    for (var count = 1; count <= 9; count++)
+                                    {
+                                        <!-- the page index buttons should be hidden only on a mobile device -->
+                                        <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingBouquetList.PageIndex ? "active" : string.Empty)">
+                                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle px-2">@count</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item mr-1">
+                                        <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@(Model.MatchingBouquetList.PageIndex + 2)" class="page-link py-0" title="Go to the next pager.">...</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item mr-1">
+                                        <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@(Model.MatchingBouquetList.PageIndex - 2 > 0 ? Model.MatchingBouquetList.PageIndex - 2 : 1)" class="page-link py-0" title="Go to the previous pager.">...</a>
+                                    </li>
+
+                                    if (Model.MatchingBouquetList.PageIndex + 9 <= Model.MatchingBouquetList.TotalPages)
+                                    {
+                                        for (var count = Model.MatchingBouquetList.PageIndex; count <= Model.MatchingBouquetList.PageIndex + 8; count++)
+                                        {
+                                            <!-- the page index buttons should be hidden only on a mobile device -->
+                                            <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingBouquetList.PageIndex ? "active" : string.Empty)">
+                                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item mr-1">
+                                            <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@(Model.MatchingBouquetList.PageIndex + 2)" class="page-link py-0" title="Go to the next pager.">...</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        for (var count = Model.MatchingBouquetList.PageIndex; count <= Model.MatchingBouquetList.TotalPages; count++)
+                                        {
+                                            <!-- the page index buttons should be hidden only on a mobile device -->
+                                            <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingBouquetList.PageIndex ? "active" : string.Empty)">
+                                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            }
+
+                            <!-- the page index navigation without the number of total items should be visible only on a mobile device -->
+                            <li class="page-index d-sm-none">@Model.MatchingBouquetList.PageIndex of @Model.MatchingBouquetList.TotalPages pages</li>
+                            <li class="page-item ml-1 mr-2 @nextPageDisabled">
+                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@(Model.MatchingBouquetList.PageIndex + 1)" class="page-link e-icons icon-next d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the next page."></a>
+                            </li>
+                            <li class="page-item @nextPageDisabled">
+                                <a asp-page="/Bouquets/List" asp-route-currentFilter="@Model.CurrentFilter" asp-route-sortOrder="@Model.CurrentSortOrder" asp-route-lowestPrice="@Model.CurrentLowestPrice" asp-route-HighestPrice="@Model.CurrentHighestPrice" asp-route-colourId="@Model.CurrentColourId" asp-route-flowerId="@Model.CurrentFlowerId" asp-route-occasionId="@Model.CurrentOccasionId" asp-route-pageIndex="@Model.MatchingBouquetList.TotalPages" class="page-link e-icons icon-last d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the last page."></a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!-- the page index navigation with the number of total items should be hidden only on a mobile device -->
+                    <div class="page-index d-none d-md-block">@Model.MatchingBouquetList.PageIndex of @Model.MatchingBouquetList.TotalPages pages (@Model.MatchingBouquetsCount items)</div>
+                </div>
+            }
+            else if (Model.MatchingBouquetsCount > 0 && Model.CurrentPageIndex > Model.MatchingBouquetList.TotalPages)
+            {
+                <div role="alert" class="alert alert-danger">Error! No such page index.</div>
+            }
+            else
+            {
+                <div role="alert" class="alert alert-warning">Sorry! No matching bouquets found.</div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    ViewData["Title"] = "Bouquets";
+    ViewData["StorePage"] = HeaderNavigation.Bouquets;
+}
+
+<script>
+    /** Click the button for submitting the bouquet filters in the sidebar when the value change of the dropdown list for bouquet filters happens by manual. */
+    function submitSidebarBouquetFilters(args) {
+        var buttonSubmitSidebarBouquetFilters = document.getElementById("sidebar-button-submit-bouquet-filters");
+        if (buttonSubmitSidebarBouquetFilters != null && args.isInteracted) {
+            buttonSubmitSidebarBouquetFilters.click();
+        }
+    };
+
+    /** Click the button for submitting the bouquet filters when the value change of the dropdown list for bouquet filters happens by manual. */
+    function submitBouquetFilters(args) {
+        var buttonSubmitBouquetFilters = document.getElementById("button-submit-bouquet-filters");
+        if (buttonSubmitBouquetFilters != null && args.isInteracted) {
+            buttonSubmitBouquetFilters.click();
+        }
+    };
+</script>
+
+@section Scripts {
+    <script type="text/javascript">
+        /** Open or hide the sidebar for the bouquet filters with the help of methods from Essential JS 2. */
+        document.addEventListener("DOMContentLoaded", function () {
+            var buttonBouquetFilterMenu = document.getElementById("bouquet-filter-menu");
+            var bouquetFilterSidebarArea = document.getElementById("sidebar-bouquet-filters");
+            if (buttonBouquetFilterMenu != null && bouquetFilterSidebarArea != null) {
+                var sidebarBouquetFilters = bouquetFilterSidebarArea.ej2_instances[0];
+                buttonBouquetFilterMenu.onclick = function () {
+                    sidebarBouquetFilters.toggle(); // open the sidebar for the bouquet filters
+                }
+                document.getElementById("bouquet-filter-sidebar-close-button").onclick = function () {
+                    sidebarBouquetFilters.hide(); // close the sidebar for the bouquet filters
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,193 @@
+﻿@* the bouquet detail page *@
+@page
+
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+
+@model DetailsModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = Model.Bouquet.Name + " - Bouquets";
+    ViewData["ReturnUrl"] = "~/Bouquets/Details?id=" + Model.Bouquet.ID;
+
+    var searchDisabled = Model.BouquetsCount == 0 ? "disabled" : string.Empty;
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-page="/Bouquets/List" class="text-decoration-none text-success">Bouquets</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">@Model.Bouquet.Name</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-page="/Bouquets/List" method="get">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control" placeholder="Search for a bouquet" @searchDisabled />
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-success" @searchDisabled>
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+<div class="row mt-3">
+    <div class="col-md-6 mb-3">
+        <div class="row">
+            <div class="col-auto d-flex flex-column pr-0">
+                <a href="#bouquetCarousel" data-slide-to="0">
+                    <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.Bouquet.PhotoUrl1)" class="rounded shadow-sm" width="54" height="54" alt="Bouquet Photo 1 - Small">
+                </a>
+                <a href="#bouquetCarousel" class="mt-2" data-slide-to="1">
+                    <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.Bouquet.PhotoUrl2)" class="rounded shadow-sm" width="54" height="54" alt="Bouquet Photo 2 - Small">
+                </a>
+            </div>
+            <div class="col">
+                <div id="bouquetCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+                    <div class="carousel-inner rounded">
+                        <div class="carousel-item active" data-interval="10000">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.Bouquet.PhotoUrl1)" class="d-block w-100" alt="Bouquet Photo 1">
+                        </div>
+                        <div class="carousel-item" data-interval="10000">
+                            <img asp-append-version="true" src="@Url.Content("~/img/bouquets/" + Model.Bouquet.PhotoUrl2)" class="d-block w-100" alt="Bouquet Photo 2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">@Model.Bouquet.Name</h5>
+                <div class="mb-3">
+                    @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                    @if (Model.Bouquet.Sales >= 1000)
+                    {
+                        <ejs-chiplist id="bouquet-category-best-sellers" text="Best seller" cssClass="e-primary" style="cursor: default"></ejs-chiplist>
+                    }
+
+                    @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                    @if (new TimeSpan(DateTime.Now.Ticks - Model.Bouquet.LaunchDate.Ticks).TotalDays <= 14)
+                    {
+                        <ejs-chiplist id="bouquet-category-new-arrivals" text="New arrival" cssClass="e-success" style="cursor: default"></ejs-chiplist>
+                    }
+
+                    @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                    @if (Model.Bouquet.Discount > 0M)
+                    {
+                        <ejs-chiplist id="bouquet-category-sale" text="@decimal.Truncate(Model.Bouquet.Discount * 100)% off" cssClass="e-danger" style="cursor: default"></ejs-chiplist>
+                    }
+
+                    <ejs-chiplist id="bouquet-category-flower-type" text="@Model.Bouquet.Flower.Name" style="cursor: default" title="The bouquet's main flower type."></ejs-chiplist>
+                    <ejs-chiplist id="bouquet-category-occasion" text="@Model.Bouquet.Occasion.Name" cssClass="e-warning" style="cursor: default" title="The bouquet's main occasion."></ejs-chiplist>
+                    <ejs-chiplist id="bouquet-category-colour" text="@Model.Bouquet.Colour.Name" cssClass="e-info" style="cursor: default" title="The bouquet's main colour."></ejs-chiplist>
+                </div>
+                <table class="w-100" style="table-layout: fixed">
+                    @* the value in the condition should be equal to the relevant value in the back-end code of the bouquet list page *@
+                    @if (Model.Bouquet.Discount > 0M)
+                    {
+                        <tr>
+                            <td>
+                                <div class="text-justify" style="font-weight: 500">Price</div>
+                            </td>
+                            <td>
+                                <div class="font-weight-bold" style="font-size: 1.5rem; text-decoration-line: line-through">&pound;@DecimalHelper.ToPriceFormat(Model.Bouquet.OriginalPrice)</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div class="font-weight-bold text-danger pb-3" style="font-size: 1.5rem">&pound;@DecimalHelper.ToPriceFormat(Model.Bouquet.OriginalPrice * (1 - Model.Bouquet.Discount))</div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <div class="text-justify" style="font-weight: 500">Price</div>
+                            </td>
+                            <td>
+                                <div class="font-weight-bold pb-3" style="font-size: 1.5rem">&pound;@DecimalHelper.ToPriceFormat(Model.Bouquet.OriginalPrice)</div>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td>
+                            <div class="text-justify pb-3" style="font-weight: 500">@Html.DisplayNameFor(model => model.Bouquet.Sales)</div>
+                        </td>
+                        <td>
+                            <div class="text-truncate pb-3">@Model.Bouquet.Sales</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="text-justify pb-3" style="font-weight: 500">@Html.DisplayNameFor(model => model.Bouquet.Stocks)</div>
+                        </td>
+                        <td>
+                            <div class="text-truncate pb-3">@Model.AvaliableStocks</div>
+                        </td>
+                    </tr>
+                </table>
+
+                @if (SignInManager.IsSignedIn(User) && !Model.IsAdministrator)
+                {
+                    @* the maximum number of different bouquets in the cart here should be equal to the relevant value in the back-end code *@
+                    var quantityEnabled = (Model.IsEmailConfirmed && Model.AvaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? true : false;
+                    var cartDisabled = (Model.IsEmailConfirmed && Model.AvaliableStocks > 0 && Model.MatchingCartDetailsCount < 10) ? string.Empty : "disabled";
+
+                    if (Model.AvaliableStocks > 0)
+                    {
+                        <form asp-page="/Cart" asp-page-handler="Add" asp-route-bouquetId="@Model.Bouquet.ID" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ejs-tooltip id="tooltip-bouquet-@Model.Bouquet.ID-quantity" content="1. At least 1, and at max the stocks of the bouquet.<br />2. The input will be automatically modified if invalid.">
+                                        <e-content-template>
+                                            <ejs-numerictextbox id="text-box-quantity" cssClass="e-success mb-3" enabled="@quantityEnabled" floatLabelType="Auto" format="n0" max="@Model.AvaliableStocks" min="1" placeholder="QTY" value="1" Type="text" name="quantity"></ejs-numerictextbox>
+                                        </e-content-template>
+                                    </ejs-tooltip>
+                                </div>
+                                <div class="col-md-8 d-flex align-items-center">
+                                    <button type="submit" class="btn btn-success btn-block" style="color: #fff" @cartDisabled>
+                                        <i class="fas fa-cart-arrow-down"></i>
+                                        <span>Add to cart</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary btn-block" style="color: #fff" disabled>Sold out</button>
+                    }
+                }
+                else if (!Model.IsAdministrator)
+                {
+                    <p class="text-secondary text-center mb-0">To add it to the cart, you need to <a asp-area="Identity" asp-page="/Account/Login" class="text-decoration-none text-success">log in</a> first.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<ejs-accordion id="bouquet-other-details" expandMode="Single">
+    <e-accordion-accordionitems>
+        <e-accordion-accordionitem expanded="true" header="@Html.DisplayNameFor(model => model.Bouquet.Description)" content="<textarea id='accordion-item-description' class='e-control w-100 text-area-description' style='font-size: 13px; height: 15em' readonly></textarea>"></e-accordion-accordionitem>
+        <e-accordion-accordionitem header="@Html.DisplayNameFor(model => model.Bouquet.LaunchDate)" content="@Model.Bouquet.LaunchDate.ToLocalTime().ToString("d MMMM yyyy", new CultureInfo("en-GB"))"></e-accordion-accordionitem>
+        <e-accordion-accordionitem header="Main flower" content="@Model.Bouquet.Flower.Name"></e-accordion-accordionitem>
+        <e-accordion-accordionitem header="Main occasion" content="@Model.Bouquet.Occasion.Name"></e-accordion-accordionitem>
+        <e-accordion-accordionitem header="Main colour" content="@Model.Bouquet.Colour.Name"></e-accordion-accordionitem>
+    </e-accordion-accordionitems>
+</ejs-accordion>
+
+@section Scripts {
+    <script type="text/javascript">
+        var accordionItemDescription = document.getElementById("accordion-item-description");
+        if (accordionItemDescription != null) {
+            accordionItemDescription.innerHTML = "@Model.Bouquet.Description";
+        };
+    </script>
+}

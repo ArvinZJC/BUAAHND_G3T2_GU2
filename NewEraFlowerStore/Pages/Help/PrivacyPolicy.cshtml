@@ -1,0 +1,19 @@
+﻿@* the privacy policy page *@
+@page
+
+@model PrivacyPolicyModel
+
+@{
+    ViewData["Title"] = "Privacy Policy";
+    ViewData["StorePage"] = HeaderNavigation.Help;
+    ViewData["HelpPage"] = HelpMenu.PrivacyPolicy;
+    ViewData["ReturnUrl"] = "~/Help/PrivacyPolicy";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Help - privacy policy</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h1 class="text-center">@ViewData["Title"]</h1>
+<p class="text-justify text-black-50 mb-0">Use this page to detail New Era Flower Store's privacy policy.</p>

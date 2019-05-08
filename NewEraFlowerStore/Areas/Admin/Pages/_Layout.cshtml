@@ -1,0 +1,179 @@
+﻿@* the layout of the admin site pages based on the layout of pages *@
+
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section Modal {
+    @RenderSection("Modal", required: false)
+}
+
+@section Sidebar {
+    <!-- the admin site sidebar should be visible only on a mobile device -->
+    <ejs-sidebar type="Over" id="sidebar-admin-site" closeOnDocumentClick="true" showBackdrop="true" class="sidebar d-flex flex-column align-items-center d-sm-none">
+        <e-content-template>
+            <div class="ml-auto mr-3" style="margin-top: 5.5rem">
+                <button type="button" id="admin-site-sidebar-close-button" class="close">&times;</button>
+            </div>
+            <div class="d-flex flex-column ml-3 mr-5 mt-3">
+                <a asp-area="Admin" asp-page="/Dashboard" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.DashboardMenuItem(ViewContext)">
+                    <i class="fas fa-tachometer-alt" style="padding-right: 0.35rem"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a asp-area="Admin" asp-page="/OtherAdministrators/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.OtherAdministratorsMenuItem(ViewContext)">
+                    <i class="fas fa-user-tie" style="padding-right: 0.6rem"></i>
+                    <span>Other administrators</span>
+                </a>
+                <a asp-area="Admin" asp-page="/RegisteredCustomers" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.RegisteredCustomersMenuItem(ViewContext)">
+                    <i class="fas fa-user-friends pr-1"></i>
+                    <span>Registered customers</span>
+                </a>
+                <a asp-area="Admin" asp-page="/AddressBooks" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.AddressBooksMenuItem(ViewContext)">
+                    <i class="far fa-address-book" style="padding-right: 0.6rem"></i>
+                    <span>Address books</span>
+                </a>
+                <a asp-area="Admin" asp-page="/Colours/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.ColoursMenuItem(ViewContext)">
+                    <i class="fas fa-palette" style="padding-right: 0.4rem"></i>
+                    <span>Colours</span>
+                </a>
+                <a asp-area="Admin" asp-page="/Flowers/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.FlowersMenuItem(ViewContext)">
+                    <i class="fas fa-atom" style="padding-right: 0.6rem"></i>
+                    <span>Flowers</span>
+                </a>
+                <a asp-area="Admin" asp-page="/Occasions/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.OccasionsMenuItem(ViewContext)">
+                    <i class="fab fa-gratipay pr-2"></i>
+                    <span>Occasions</span>
+                </a>
+                <a asp-area="Admin" asp-page="/Bouquets/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.BouquetsMenuItem(ViewContext)">
+                    <i class="fas fa-box-open pr-1"></i>
+                    <span>Bouquets</span>
+                </a>
+                <a asp-area="Admin" asp-page="/Orders/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.OrdersMenuItem(ViewContext)">
+                    <i class="far fa-file-alt" style="padding-right: 0.75rem"></i>
+                    <span>Orders</span>
+                </a>
+                <a asp-area="Admin" asp-page="/SalesRecords" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @AdminSiteMenu.SalesRecordsMenuItem(ViewContext)">
+                    <i class="fas fa-compact-disc" style="padding-right: 0.6rem"></i>
+                    <span>Sales records</span>
+                </a>
+            </div>
+            <div class="ml-3 mr-auto mt-auto">
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" role="button" class="btn rounded-0 px-3 py-3 sidebar-tool">
+                    <i class="fas fa-angle-double-left pr-1"></i>
+                    <span>My user centre</span>
+                </a>
+            </div>
+        </e-content-template>
+    </ejs-sidebar>
+}
+
+@section BreadcrumbItems {
+    @if (string.IsNullOrWhiteSpace((string)ViewData["AdminSiteFunction"]))
+    {
+        <li class="breadcrumb-item active" aria-current="page">Admin - @ViewData["AdminSiteMenuItem"]</li>
+    }
+    else
+    {
+        @RenderSection("AdditionalBreadcrumbItems")
+
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["AdminSiteFunction"]</li>
+    }
+}
+
+<!-- the page title and the button for hiding or toggling the admin site menu should be visible only on a mobile device -->
+<div class="row d-sm-none">
+    <div class="col-auto d-flex align-items-center pr-0">
+        <a role="button" id="admin-site-menu" class="btn border-0" title="Click to show features of the admin site.">
+            <i class="fas fa-bars text-black-50"></i>
+        </a>
+        <span class="e-badge e-badge-notification e-badge-overlap bg-success text-white ml-3" style="width: 5.1rem">Click me!</span>
+    </div>
+    <div class="col d-flex align-items-center justify-content-center">
+        @if (!string.Equals((string)ViewData["Title"], "User Centre", StringComparison.OrdinalIgnoreCase))
+        {
+            <h5 class="text-truncate mb-0">@ViewData["Title"]</h5>
+        }
+    </div>
+</div>
+
+@if (!string.Equals((string)ViewData["Title"], "User Centre", StringComparison.OrdinalIgnoreCase))
+{
+    <!-- the horizontal rule should be visible only on a mobile device -->
+    <hr class="d-sm-none" />
+}
+
+<div class="row">
+    <!-- the admin site navigation should be hidden only on a mobile device -->
+    <div class="col-md-3 d-none d-md-block">
+        <div class="d-flex flex-column bg-light rounded shadow">
+            <a asp-area="Admin" asp-page="/Dashboard" class="btn rounded-0 mt-2 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.DashboardMenuItem(ViewContext)">
+                <i class="fas fa-tachometer-alt" style="padding-right: 0.35rem"></i>
+                <span>Dashboard</span>
+            </a>
+            <a asp-area="Admin" asp-page="/OtherAdministrators/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.OtherAdministratorsMenuItem(ViewContext)">
+                <i class="fas fa-user-tie" style="padding-right: 0.6rem"></i>
+                <span>Other administrators</span>
+            </a>
+            <a asp-area="Admin" asp-page="/RegisteredCustomers" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.RegisteredCustomersMenuItem(ViewContext)">
+                <i class="fas fa-user-friends pr-1"></i>
+                <span>Registered customers</span>
+            </a>
+            <a asp-area="Admin" asp-page="/AddressBooks" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.AddressBooksMenuItem(ViewContext)">
+                <i class="far fa-address-book" style="padding-right: 0.6rem"></i>
+                <span>Address books</span>
+            </a>
+            <a asp-area="Admin" asp-page="/Colours/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.ColoursMenuItem(ViewContext)">
+                <i class="fas fa-palette" style="padding-right: 0.4rem"></i>
+                <span>Colours</span>
+            </a>
+            <a asp-area="Admin" asp-page="/Flowers/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.FlowersMenuItem(ViewContext)">
+                <i class="fas fa-atom" style="padding-right: 0.6rem"></i>
+                <span>Flowers</span>
+            </a>
+            <a asp-area="Admin" asp-page="/Occasions/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.OccasionsMenuItem(ViewContext)">
+                <i class="fab fa-gratipay pr-2"></i>
+                <span>Occasions</span>
+            </a>
+            <a asp-area="Admin" asp-page="/Bouquets/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.BouquetsMenuItem(ViewContext)">
+                <i class="fas fa-box-open pr-1"></i>
+                <span>Bouquets</span>
+            </a>
+            <a asp-area="Admin" asp-page="/Orders/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.OrdersMenuItem(ViewContext)">
+                <i class="far fa-file-alt" style="padding-right: 0.75rem"></i>
+                <span>Orders</span>
+            </a>
+            <a asp-area="Admin" asp-page="/SalesRecords" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @AdminSiteMenu.SalesRecordsMenuItem(ViewContext)">
+                <i class="fas fa-compact-disc" style="padding-right: 0.6rem"></i>
+                <span>Sales records</span>
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" role="button" class="btn rounded-0 mt-4 mb-2 px-3 py-2 text-left sidebar-tool">
+                <i class="fas fa-angle-double-left pr-1"></i>
+                <span>My user centre</span>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        /** Open or hide the sidebar for the admin site with the help of methods from Essential JS 2. */
+        document.addEventListener("DOMContentLoaded", function () {
+            var buttonAdminSiteMenu = document.getElementById("admin-site-menu");
+            var adminSiteSidebarArea = document.getElementById("sidebar-admin-site");
+            if (buttonAdminSiteMenu != null && adminSiteSidebarArea != null) {
+                var sidebarAdminSite = adminSiteSidebarArea.ej2_instances[0];
+                buttonAdminSiteMenu.onclick = function () {
+                    sidebarAdminSite.toggle(); // open the sidebar for the admin site
+                }
+                document.getElementById("admin-site-sidebar-close-button").onclick = function () {
+                    sidebarAdminSite.hide(); // close the sidebar for the admin site
+                }
+            }
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+}

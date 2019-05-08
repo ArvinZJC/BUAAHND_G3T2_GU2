@@ -1,0 +1,168 @@
+﻿@* the order detail page for an administrator *@
+@page
+
+@using System.Globalization
+
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Order Details";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Orders;
+    ViewData["AdminSiteMenuItem"] = "orders";
+    ViewData["AdminSiteFunction"] = "Details";
+
+    var localOrderTime = Model.MatchingOrder.OrderTime.ToLocalTime().DateTime;
+    var britainCultureInfo = new CultureInfo("en-GB");
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Admin" asp-page="/Orders/Index" class="text-decoration-none text-success">Admin - @ViewData["AdminSiteMenuItem"]</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    <div class="border rounded mb-3 px-2 py-2">
+        <p class="mb-1">Order ID: <b>@Model.MatchingOrder.ID</b></p>
+        <p class="d-flex mb-1">
+            <span>Order status: <b>@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == Model.MatchingOrder.OrderStatusId).DisplayName</b></span>
+
+            @if (Model.MatchingOrder.OrderStatusId == 5 || Model.MatchingOrder.OrderStatusId == 6 || Model.MatchingOrder.OrderStatusId == 7 || Model.MatchingOrder.OrderStatusId == 10)
+            {
+                <a asp-area="Admin" asp-page="/Orders/Status" asp-route-id="@Model.MatchingOrder.ID" class="btn rounded-0 text-success sidebar-menu-item bg-transparent py-0" style="font-size: 0.9rem" title="Change order status.">
+                    <i class="fas fa-edit"></i>
+                </a>
+            }
+        </p>
+        <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.OrderTime): <b>@(localOrderTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localOrderTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+
+        @if (Model.MatchingOrder.PaymentTime != null)
+        {
+            var localPaymentTime = ((DateTimeOffset)Model.MatchingOrder.PaymentTime).ToLocalTime().DateTime;
+
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.PaymentTime): <b>@(localPaymentTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localPaymentTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.PaymentTime): -</p>
+        }
+
+        @if (Model.MatchingOrder.DeliveryTime != null)
+        {
+            var localDeliveryTime = ((DateTimeOffset)Model.MatchingOrder.DeliveryTime).ToLocalTime().DateTime;
+
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.DeliveryTime): <b>@(localDeliveryTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localDeliveryTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.DeliveryTime): -</p>
+        }
+
+        @if (Model.MatchingOrder.CompletionTime != null)
+        {
+            var localCompletionTime = ((DateTimeOffset)Model.MatchingOrder.CompletionTime).ToLocalTime().DateTime;
+
+            <p class="mb-0">@Html.DisplayNameFor(model => model.MatchingOrder.CompletionTime): <b>@(localCompletionTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localCompletionTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-0">@Html.DisplayNameFor(model => model.MatchingOrder.CompletionTime): -</p>
+        }
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col pr-1">
+            <table class="w-100 border" style="table-layout: fixed">
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">Consignee</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.FirstName) && string.IsNullOrWhiteSpace(Model.MatchingOrder.LastName) ? "-" : Model.MatchingOrder.FirstName + " " + Model.MatchingOrder.LastName)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.DetailedAddress)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.DetailedAddress) ? "-" : Model.MatchingOrder.DetailedAddress)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.ZipOrPostalCode)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.ZipOrPostalCode) ? "-" : Model.MatchingOrder.ZipOrPostalCode)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.PhoneNumber)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.PhoneNumber) ? "-" : Model.MatchingOrder.PhoneNumber)</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-auto pl-1">
+            @if (Model.MatchingOrder.OrderStatusId == 1 || Model.MatchingOrder.OrderStatusId == 4 || Model.MatchingOrder.OrderStatusId == 5)
+            {
+                <a asp-area="Admin" asp-page="/Orders/DeliveryInfo" asp-route-id="@Model.MatchingOrder.ID" role="button" class="btn btn-outline-success rounded-circle pt-1 pr-2 shadow" style="padding-left: 0.56rem !important" title="Edit delivery info of this order.">
+                    <i class="fas fa-edit"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <hr />
+
+    @if (Model.MatchingOrderDetailsCount > 0)
+    {
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "BouquetName", direction = "Ascending" }
+        };
+
+        <ejs-grid id="data-grid-bouquets-ordered" allowSelection="true" allowSorting="true" dataSource="@Model.MatchingOrderDetailList">
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="BouquetName" headerText="@Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].BouquetName)" clipMode="EllipsisWithTooltip"></e-grid-column>
+                <e-grid-column field="Price" headerText="@(Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].Price)) (&pound;)" clipMode="EllipsisWithTooltip" format="N2" textAlign="Right" width="105"></e-grid-column>
+                <e-grid-column field="Quantity" headerText="@Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].Quantity)" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" type="number" width="85"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+        <table class="w-100 border border-top-0" style="table-layout: fixed">
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">Subtotal</div>
+                </td>
+                <td>
+                    <div class="text-right pr-2">&pound;@DecimalHelper.ToPriceFormat(Model.Subtotal)</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.Postage)</div>
+                </td>
+                <td>
+                    <div class="text-right pr-2">&pound;@DecimalHelper.ToPriceFormat(Model.MatchingOrder.Postage)</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">Total</div>
+                </td>
+                <td>
+                    <div class="text-right font-weight-bold pr-2" style="font-size: 18px">&pound;@DecimalHelper.ToPriceFormat(Model.Subtotal + Model.MatchingOrder.Postage)</div>
+                </td>
+            </tr>
+        </table>
+    }
+}

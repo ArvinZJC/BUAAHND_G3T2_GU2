@@ -1,0 +1,229 @@
+﻿@* the order detail page for a customer *@
+@page
+
+@model DetailsModel
+
+@{
+    Layout = "~/Areas/Identity/Pages/Account/Manage/_Layout.cshtml";
+    ViewData["Title"] = "Order Details";
+    ViewData["UserCentreFunction"] = "Details";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.Orders;
+
+    var localOrderTime = Model.MatchingOrder.OrderTime.ToLocalTime().DateTime;
+    var britainCultureInfo = new CultureInfo("en-GB");
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" class="text-success text-decoration-none">Orders</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    @section Modal {
+        @if (Model.MatchingOrder.OrderStatusId == 2 || Model.MatchingOrder.OrderStatusId == 3 || Model.MatchingOrder.OrderStatusId == 9 || Model.MatchingOrder.OrderStatusId == 11)
+        {
+            <div role="dialog" id="modal-deleting-confirmation-@Model.MatchingOrder.ID" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@Model.MatchingOrder.ID-title" aria-hidden="true">
+                <div role="document" class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="modal-deleting-confirmation-@Model.MatchingOrder.ID-title" class="modal-title">Deleting Confirmation</h5>
+                            <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        </div>
+                        <div class="modal-body text-justify">Are you sure to delete the order with ID "@Model.MatchingOrder.ID"?</div>
+                        <div class="modal-footer">
+                            <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Delete" asp-route-id="@Model.MatchingOrder.ID" method="post">
+                                <button type="submit" class="btn btn-warning">Yes</button>
+                            </form>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="border rounded mb-3 px-2 py-2">
+        <p class="mb-1">Order ID: <b>@Model.MatchingOrder.ID</b></p>
+        <p class="mb-1">Order status: <b>@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == Model.MatchingOrder.OrderStatusId).DisplayName</b></p>
+        <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.OrderTime): <b>@(localOrderTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localOrderTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+
+        @if (Model.MatchingOrder.PaymentTime != null)
+        {
+            var localPaymentTime = ((DateTimeOffset)Model.MatchingOrder.PaymentTime).ToLocalTime().DateTime;
+
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.PaymentTime): <b>@(localPaymentTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localPaymentTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.PaymentTime): -</p>
+        }
+
+        @if (Model.MatchingOrder.DeliveryTime != null)
+        {
+            var localDeliveryTime = ((DateTimeOffset)Model.MatchingOrder.DeliveryTime).ToLocalTime().DateTime;
+
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.DeliveryTime): <b>@(localDeliveryTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localDeliveryTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-1">@Html.DisplayNameFor(model => model.MatchingOrder.DeliveryTime): -</p>
+        }
+
+        @if (Model.MatchingOrder.CompletionTime != null)
+        {
+            var localCompletionTime = ((DateTimeOffset)Model.MatchingOrder.CompletionTime).ToLocalTime().DateTime;
+
+            <p class="mb-0">@Html.DisplayNameFor(model => model.MatchingOrder.CompletionTime): <b>@(localCompletionTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localCompletionTime.ToString("HH:mm:ss", britainCultureInfo))</b></p>
+        }
+        else
+        {
+            <p class="mb-0">@Html.DisplayNameFor(model => model.MatchingOrder.CompletionTime): -</p>
+        }
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col pr-1">
+            <table class="w-100 border" style="table-layout: fixed">
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">Consignee</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.FirstName) && string.IsNullOrWhiteSpace(Model.MatchingOrder.LastName) ? "-" : Model.MatchingOrder.FirstName + " " + Model.MatchingOrder.LastName)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.DetailedAddress)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.DetailedAddress) ? "-" : Model.MatchingOrder.DetailedAddress)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.ZipOrPostalCode)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.ZipOrPostalCode) ? "-" : Model.MatchingOrder.ZipOrPostalCode)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.PhoneNumber)</div>
+                    </td>
+                    <td>
+                        <div class="text-justify pr-2">@(string.IsNullOrWhiteSpace(Model.MatchingOrder.PhoneNumber) ? "-" : Model.MatchingOrder.PhoneNumber)</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-auto pl-1">
+            @if (Model.MatchingOrder.OrderStatusId == 1 || Model.MatchingOrder.OrderStatusId == 4)
+            {
+                <a asp-area="Identity" asp-page="/Account/Manage/Orders/DeliveryInfo" asp-route-id="@Model.MatchingOrder.ID" role="button" class="btn btn-outline-success rounded-circle pt-1 pr-2 shadow" style="padding-left: 0.56rem !important" title="Reconfirm your delivery info.">
+                    <i class="fas fa-edit"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <hr />
+
+    @if (Model.MatchingOrderDetailsCount > 0)
+    {
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "BouquetName", direction = "Ascending" }
+        };
+
+        <ejs-grid id="data-grid-bouquets-ordered" allowSelection="true" allowSorting="true" dataSource="@Model.MatchingOrderDetailList">
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="BouquetName" headerText="@Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].BouquetName)" clipMode="EllipsisWithTooltip"></e-grid-column>
+                <e-grid-column field="Price" headerText="@(Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].Price)) (&pound;)" clipMode="EllipsisWithTooltip" format="N2" textAlign="Right" width="105"></e-grid-column>
+                <e-grid-column field="Quantity" headerText="@Html.DisplayNameFor(model => model.MatchingOrderDetailList[0].Quantity)" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" type="number" width="85"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+        <table class="w-100 border border-top-0" style="table-layout: fixed">
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">Subtotal</div>
+                </td>
+                <td>
+                    <div class="text-right pr-2">&pound;@DecimalHelper.ToPriceFormat(Model.Subtotal)</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrder.Postage)</div>
+                </td>
+                <td>
+                    <div class="text-right pr-2">&pound;@DecimalHelper.ToPriceFormat(Model.MatchingOrder.Postage)</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="text-justify pl-2" style="font-weight: 500">Total</div>
+                </td>
+                <td>
+                    <div class="text-right font-weight-bold pr-2" style="font-size: 18px">&pound;@DecimalHelper.ToPriceFormat(Model.Subtotal + Model.MatchingOrder.Postage)</div>
+                </td>
+            </tr>
+        </table>
+    }
+
+    if(Model.MatchingOrder.OrderStatusId != 5 && Model.MatchingOrder.OrderStatusId != 6 && Model.MatchingOrder.OrderStatusId != 7 && Model.MatchingOrder.OrderStatusId != 10)
+    {
+        <hr />
+    }
+    
+    <div class="row">
+        <div class="col-md">
+            @if (Model.MatchingOrder.OrderStatusId == 1)
+            {
+                <a asp-area="Identity" asp-page="/Account/Manage/Orders/DeliveryInfo" asp-route-id="@Model.MatchingOrder.ID" role="button" class="btn btn-warning d-block d-md-inline-block">Confirm delivery info</a>
+            }
+
+            @if (Model.MatchingOrder.OrderStatusId == 4)
+            {
+                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Details" asp-page-handler="PayBill" asp-route-id="@Model.MatchingOrder.ID" method="post">
+                    <button type="submit" class="btn btn-warning btn-block btn-md-inline-block">Pay the bill</button>
+                </form>
+            }
+
+            @if (Model.MatchingOrder.OrderStatusId == 8)
+            {
+                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="ConfirmReceipt" asp-route-id="@Model.MatchingOrder.ID" asp-route-returnUrl="~/Identity/Account/Manage/Orders/Details?id=@Model.MatchingOrder.ID" method="post">
+                    <button type="submit" class="btn btn-warning btn-block btn-md-inline-block">Confirm the receipt</button>
+                </form>
+            }
+        </div>
+        <div class="col-md text-right">
+            @if (Model.MatchingOrder.OrderStatusId == 1 || Model.MatchingOrder.OrderStatusId == 4)
+            {
+                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Cancel" asp-route-id="@Model.MatchingOrder.ID" asp-route-returnUrl="~/Identity/Account/Manage/Orders/Details?id=@Model.MatchingOrder.ID" method="post">
+                    <button type="submit" class="btn btn-success btn-block btn-md-inline-block">Cancel</button>
+                </form>
+            }
+
+            @if (Model.MatchingOrder.OrderStatusId == 2 || Model.MatchingOrder.OrderStatusId == 3 || Model.MatchingOrder.OrderStatusId == 9 || Model.MatchingOrder.OrderStatusId == 11)
+            {
+                <a role="button" class="btn btn-success text-white d-block d-md-inline-block" data-toggle="modal" data-target="#modal-deleting-confirmation-@Model.MatchingOrder.ID">Delete</a>
+            }
+
+            @if (Model.MatchingOrder.OrderStatusId == 8)
+            {
+                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Refund" asp-route-id="@Model.MatchingOrder.ID" asp-route-returnUrl="~/Identity/Account/Manage/Orders/Details?id=@Model.MatchingOrder.ID" method="post">
+                    <button type="submit" class="btn btn-success btn-block btn-md-inline-block">Refund</button>
+                </form>
+            }
+        </div>
+    </div>
+}

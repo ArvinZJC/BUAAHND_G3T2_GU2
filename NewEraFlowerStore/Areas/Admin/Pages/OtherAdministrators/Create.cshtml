@@ -1,0 +1,124 @@
+﻿@* the page for creating an administrator account *@
+@page
+
+@model CreateModel
+
+@{
+    ViewData["Title"] = "Create Administrator Account";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.OtherAdministrators;
+    ViewData["AdminSiteMenuItem"] = "other administrators";
+    ViewData["AdminSiteFunction"] = "Create";
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Admin" asp-page="/OtherAdministrators/Index" class="text-decoration-none text-success">Admin - @ViewData["AdminSiteMenuItem"]</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-area="Admin" asp-page="/OtherAdministrators/Create" method="post">
+    <div class="form-group">
+        <ejs-tooltip id="tooltip-username" content="1. At max 25 characters long.<br />2. No non-alphanumeric character." position="TopLeft">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Input.Username" autofocus required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Input.Username" class="e-float-text"></label>
+                </div>
+                <div class="text-justify">
+                    <span asp-validation-for="Input.Username" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group row">
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-first-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="LeftCenter">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        <input asp-for="Input.FirstName" required />
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.FirstName" class="e-float-text"></label>
+                    </div>
+                    <div>
+                        <span asp-validation-for="Input.FirstName" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-last-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="RightCenter">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        <input asp-for="Input.LastName" required />
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.LastName" class="e-float-text"></label>
+                    </div>
+                    <div>
+                        <span asp-validation-for="Input.LastName" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <!-- set the type attribute value to "text" instead of "email" to float the relevant label correctly when the email address entered is invalid -->
+            <input asp-for="Input.Email" type="text" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.Email" class="e-float-text"></label>
+        </div>
+        <div class="e-control">
+            <span asp-validation-for="Input.Email" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <input asp-for="Input.PhoneNumber" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.PhoneNumber" class="e-float-text"></label>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+        <ejs-tooltip id="tooltip-password" content="1. At least 8 and at max 20 characters long.<br />2. At least 1 digit (0 - 9) and 1 letter.<br />3. No non-alphanumeric character." position="LeftCenter">
+            <e-content-template>
+                <div class="e-float-input e-input-group e-success">
+                    <input asp-for="Input.Password" required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Input.Password" class="e-float-text"></label>
+                    <span id="password-eye" class="e-input-group-icon fas fa-eye-slash" title="Click to show the password." onclick="hideOrShowPassword()"></span>
+                </div>
+                <div>
+                    <span asp-validation-for="Input.Password" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-input-group e-success">
+            <input asp-for="Input.ConfirmPassword" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.ConfirmPassword" class="e-float-text"></label>
+            <span id="confirmation-password-eye" class="e-input-group-icon fas fa-eye-slash" title="Click to show the confirmation password." onclick="hideOrShowConfirmationPassword()"></span>
+        </div>
+        <div class="e-control">
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" @(Model.IsEmailConfirmed ? string.Empty : "disabled")>OK</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+}

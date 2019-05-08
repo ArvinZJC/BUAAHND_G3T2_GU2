@@ -1,0 +1,296 @@
+﻿@* the order list page for a customer *@
+@page
+
+@using Microsoft.EntityFrameworkCore
+
+@model NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders.IndexModel
+
+@inject ApplicationDbContext DbContext
+
+@{
+    Layout = "~/Areas/Identity/Pages/Account/Manage/_Layout.cshtml";
+    ViewData["Title"] = "Orders";
+    ViewData["UserCentreFunction"] = "Orders";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.Orders;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    var noPreviousPage = !Model.MatchingOrderList.HasPreviousPage ? "true" : "false";
+    var noNextPage = !Model.MatchingOrderList.HasNextPage ? "true" : "false";
+    var previousPageDisabled = !Model.MatchingOrderList.HasPreviousPage ? "disabled" : string.Empty;
+    var nextPageDisabled = !Model.MatchingOrderList.HasNextPage ? "disabled" : string.Empty;
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <div role="alert" class="alert alert-warning text-justify mb-0" style="font-size: 12px">
+                <h6 class="alert-heading">Notes</h6>
+                <p class="text-justify mb-0">1. Your orders are displayed in descending order by the order time.</p>
+                <p class="text-justify mb-0">2. Delivery info has to be confirmed in <b>15 minutes</b> after creating an order.</p>
+                <p class="text-justify mb-0">3. Payment has to be confirmed in <b>30 minutes</b> after creating an order.</p>
+                <p class="text-justify mb-0">4. Due to particularities of bouquets, an order will be automatically completed if the consumer do not ask for a refund in <b>24 hours</b> after delivery.</p>
+                <p class="text-justify mb-0">5. Once an order is completed, it cannot be refunded.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3 d-flex align-items-center">
+            <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" method="get" class="w-100">
+                <ejs-dropdownlist ejs-for="@Model.CurrentOrderStatusId" id="dropdown-list-order-status" cssClass="e-success mr-3" change="submitOrderStatus" dataSource="@Model.OrderStatusList" enabled="@(Model.UserOrdersCount > 0 ? true : false)" floatLabelType="Auto" placeholder="Order status" name="orderStatusId">
+                    <e-dropdownlist-fields text="DisplayName" value="ID"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+                <button type="submit" id="button-submit-order-status" hidden>Confirm</button>
+            </form>
+        </div>
+    </div>
+
+    @if ((Model.MatchingOrderList.TotalPages == 0 && Model.CurrentPageIndex == 1) || Model.CurrentPageIndex <= Model.MatchingOrderList.TotalPages)
+    {
+        if (Model.UserOrdersCount > 0)
+        {
+            if (Model.CurrentOrderStatusId != 0 && Model.MatchingOrdersCount == 0)
+            {
+                <div role="alert" class="alert alert-warning alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="text-justify mb-0">Sorry! No matching orders found.</p>
+                </div>
+            }
+
+            @section Modal {
+                @foreach (var item in Model.MatchingOrderList)
+                {
+                    if (item.OrderStatusId == 2 || item.OrderStatusId == 3 || item.OrderStatusId == 9 || item.OrderStatusId == 11)
+                    {
+                        <div role="dialog" id="modal-deleting-confirmation-@item.ID" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@item.ID-title" aria-hidden="true">
+                            <div role="document" class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 id="modal-deleting-confirmation-@item.ID-title" class="modal-title">Deleting Confirmation</h5>
+                                        <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </a>
+                                    </div>
+                                    <div class="modal-body text-justify">Are you sure to delete the order with ID "@item.ID"?</div>
+                                    <div class="modal-footer">
+                                        <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Delete" asp-route-id="@item.ID" method="post">
+                                            <button type="submit" class="btn btn-warning">Yes</button>
+                                        </form>
+                                        <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+
+            var britainCultureInfo = new CultureInfo("en-GB");
+
+            foreach (var item in Model.MatchingOrderList)
+            {
+                var matchingOrderDetails = DbContext.OrderDetails.Include(orderDetail => orderDetail.Order).Where(orderDetail => orderDetail.OrderId == item.ID);
+                var matchingOrderDetailsCount = await matchingOrderDetails.CountAsync();
+                var matchingOrderDetailList = await matchingOrderDetails.ToListAsync();
+                var localOrderTime = item.OrderTime.ToLocalTime().DateTime;
+                var totalPrice = 0M;
+
+                <div class="e-card w-100 mb-3">
+                    <a asp-area="Identity" asp-page="/Account/Manage/Orders/Details" asp-route-id="@item.ID" class="e-card-header text-decoration-none pb-0" title="Click to view order details.">
+                        <div class="e-card-header-caption">
+                            <div class="e-card-header-title font-weight-bold" style="font-size: 15px">Order ID: @item.ID</div>
+                        </div>
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Orders/Details" asp-route-id="@item.ID" class="e-card-content text-decoration-none pb-0" style="line-height: 2" title="Click to view order details.">
+                        <table class="w-100" style="table-layout: fixed">
+                            <tr>
+                                <td>
+                                    <div class="text-justify" style="font-weight: 500">Status</div>
+                                </td>
+                                <td>
+                                    <div class="text-justify font-weight-bold">@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == item.OrderStatusId).DisplayName</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="text-justify" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingOrderList[0].OrderTime)</div>
+                                </td>
+                                <td>
+                                    <div class="text-justify">@(localOrderTime.ToString("d MMMM yyyy", britainCultureInfo) + " at " + localOrderTime.ToString("HH:mm:ss", britainCultureInfo))</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        @if (matchingOrderDetailsCount > 0)
+                        {
+                            foreach (var detailItem in matchingOrderDetailList)
+                            {
+                                totalPrice += DecimalHelper.ToPriceFormat(detailItem.Price) * detailItem.Quantity;
+                            }
+
+                            totalPrice += item.Postage;
+
+                            <div class="text-right" style="font-weight: 500">@matchingOrderDetailsCount @(matchingOrderDetailsCount == 1 ? "bouquet" : "different bouquets")</div>
+                            <div class="text-right" style="font-size: 18px; font-weight: 500">Total: &pound;@DecimalHelper.ToPriceFormat(totalPrice)</div>
+                        }
+                        else
+                        {
+                            <div class="text-right text-danger">Error! No matching order details.</div>
+                        }
+                    </a>
+                    <div class="row" style="padding-top: 12px">
+                        <div class="col-md" style="margin: 0 12px 12px 12px">
+                            @if (item.OrderStatusId == 1)
+                            {
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/DeliveryInfo" asp-route-id="@item.ID" role="button" class="btn btn-warning d-block d-md-inline-block">Confirm delivery info</a>
+                            }
+
+                            @if (item.OrderStatusId == 4)
+                            {
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Details" asp-route-id="@item.ID" role="button" class="btn btn-warning d-block d-md-inline-block">Confirm payment</a>
+                            }
+
+                            @if (item.OrderStatusId == 8)
+                            {
+                                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="ConfirmReceipt" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-warning btn-block btn-md-inline-block">Confirm the receipt</button>
+                                </form>
+                            }
+                        </div>
+                        <div class="col-md text-right" style="margin: 0 12px 12px 12px">
+                            @if (item.OrderStatusId == 1 || item.OrderStatusId == 4)
+                            {
+                                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Cancel" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-success btn-block btn-md-inline-block">Cancel</button>
+                                </form>
+                            }
+
+                            @if (item.OrderStatusId == 2 || item.OrderStatusId == 3 || item.OrderStatusId == 9 || item.OrderStatusId == 11)
+                            {
+                                <a role="button" class="btn btn-success text-white d-block d-md-inline-block" data-toggle="modal" data-target="#modal-deleting-confirmation-@item.ID">Delete</a>
+                            }
+
+                            @if (item.OrderStatusId == 8)
+                            {
+                                <form asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-page-handler="Refund" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-success btn-block btn-md-inline-block">Refund</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            if (Model.CurrentOrderStatusId == 0 || Model.MatchingOrdersCount > 0)
+            {
+                <div class="d-md-flex justify-content-md-between">
+                    <nav>
+                        <ul class="pagination d-flex justify-content-between mb-0">
+                            <li class="page-item mr-2 @previousPageDisabled">
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="1" class="page-link e-icons icon-first d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the first page."></a>
+                            </li>
+                            <li class="page-item mr-2 @previousPageDisabled">
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@(Model.MatchingOrderList.PageIndex - 1)" class="page-link e-icons icon-previous d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the previous page."></a>
+                            </li>
+
+                            @if (Model.MatchingOrderList.TotalPages <= 10)
+                            {
+                                for (var count = 1; count <= Model.MatchingOrderList.TotalPages; count++)
+                                {
+                                    <!-- the page index buttons should be hidden only on a mobile device -->
+                                    <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingOrderList.PageIndex ? "active" : string.Empty)">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                if (Model.MatchingOrderList.PageIndex == 1)
+                                {
+                                    for (var count = 1; count <= 9; count++)
+                                    {
+                                        <!-- the page index buttons should be hidden only on a mobile device -->
+                                        <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingOrderList.PageIndex ? "active" : string.Empty)">
+                                            <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle px-2">@count</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item mr-1">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@(Model.MatchingOrderList.PageIndex + 2)" class="page-link py-0" title="Go to the next pager.">...</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item mr-1">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@(Model.MatchingOrderList.PageIndex - 2 > 0 ? Model.MatchingOrderList.PageIndex - 2 : 1)" class="page-link py-0" title="Go to the previous pager.">...</a>
+                                    </li>
+
+                                    if (Model.MatchingOrderList.PageIndex + 9 <= Model.MatchingOrderList.TotalPages)
+                                    {
+                                        for (var count = Model.MatchingOrderList.PageIndex; count <= Model.MatchingOrderList.PageIndex + 8; count++)
+                                        {
+                                            <!-- the page index buttons should be hidden only on a mobile device -->
+                                            <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingOrderList.PageIndex ? "active" : string.Empty)">
+                                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item mr-1">
+                                            <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@(Model.MatchingOrderList.PageIndex + 2)" class="page-link py-0" title="Go to the next pager.">...</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        for (var count = Model.MatchingOrderList.PageIndex; count <= Model.MatchingOrderList.TotalPages; count++)
+                                        {
+                                            <!-- the page index buttons should be hidden only on a mobile device -->
+                                            <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingOrderList.PageIndex ? "active" : string.Empty)">
+                                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@count" class="page-link page-index rounded-circle @(count >= 10 ? "px-1" : "px-2")">@count</a>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            }
+
+                            <!-- the page index navigation without the number of total items should be visible only on a mobile device -->
+                            <li class="page-index d-sm-none">@Model.MatchingOrderList.PageIndex of @Model.MatchingOrderList.TotalPages pages</li>
+                            <li class="page-item ml-1 mr-2 @nextPageDisabled">
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@(Model.MatchingOrderList.PageIndex + 1)" class="page-link e-icons icon-next d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the next page."></a>
+                            </li>
+                            <li class="page-item @nextPageDisabled">
+                                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" asp-route-orderStatusId="@Model.CurrentOrderStatusId" asp-route-pageIndex="@Model.MatchingOrderList.TotalPages" class="page-link e-icons icon-last d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the last page."></a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!-- the page index navigation with the number of total items should be hidden only on a mobile device -->
+                    <div class="page-index d-none d-md-block">@Model.MatchingOrderList.PageIndex of @Model.MatchingOrderList.TotalPages pages (@(Model.CurrentOrderStatusId == 0 ? Model.UserOrdersCount : Model.MatchingOrdersCount) items)</div>
+                </div>
+            }
+        }
+        else
+        {
+            <label>No orders yet? <a asp-page="/Cart" class="text-success text-decoration-none">Check out now</a>.</label>
+        }
+    }
+    else
+    {
+        <div role="alert" class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <p class="text-justify mb-0">Error! No such page index.</p>
+        </div>
+    }
+}
+
+<script type="text/javascript">
+    /** Click the button for submitting the order status when the value change of the dropdown list for the order status happens by manual. */
+    function submitOrderStatus(args) {
+        var buttonSubmitOrderStatus = document.getElementById("button-submit-order-status");
+        if (buttonSubmitOrderStatus != null && args.isInteracted) {
+            buttonSubmitOrderStatus.click();
+        }
+    };
+</script>

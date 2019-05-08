@@ -1,0 +1,93 @@
+﻿@* the sales record list page *@
+@page
+
+@model SalesRecordsModel
+
+@{
+    ViewData["Title"] = "Sales Records";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.SalesRecords;
+    ViewData["AdminSiteMenuItem"] = "sales records";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    if (Model.SalesRecordForm.Count() > 0)
+    {
+        @section Modal {
+            @foreach (var item in Model.SalesRecordList)
+            {
+                <div role="dialog" id="modal-deleting-confirmation-@item.ID" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@item.ID-title" aria-hidden="true">
+                    <div role="document" class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="modal-deleting-confirmation-@item.ID-title" class="modal-title">Deleting Confirmation</h5>
+                                <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                            <div class="modal-body text-justify">Are you sure to delete the sales record with ID "@item.ID" permanently?</div>
+                            <div class="modal-footer">
+                                <form asp-area="Admin" asp-page="/SalesRecords" asp-page-handler="Delete" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-warning">Yes</button>
+                                </form>
+                                <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        var defaultSortOrder = new List<object>()
+        {
+            new{ field = "CreationTime", direction = "Descending" }
+        };
+
+        <ejs-grid id="data-grid-sales-record" allowFiltering="true" allowGrouping="true" allowPaging="true" allowSelection="true" allowSorting="true" dataSource="@Model.SalesRecordForm" height="auto" load="formatDate" locale="customised" toolbar="@(new List<string>() { "Search" })" width="auto">
+            <e-grid-filtersettings type="Excel"></e-grid-filtersettings>
+             <e-grid-groupsettings disablePageWiseAggregates="false"></e-grid-groupsettings>
+            <e-grid-pagesettings pageSize="10" pageSizes="true"></e-grid-pagesettings>
+            <e-grid-sortsettings columns="defaultSortOrder"></e-grid-sortsettings>
+            <e-grid-columns>
+                <e-grid-column field="Id" headerText="ID" allowGrouping="false" allowSorting="false" clipMode="EllipsisWithTooltip" textAlign="Right" width="15%"></e-grid-column>
+                <e-grid-column field="SalesAmount" headerText="Sales amount (&pound;)" allowGrouping="false" clipMode="EllipsisWithTooltip" format="N2" textAlign="Right" width="30%"></e-grid-column>
+                <e-grid-column field="CreationTime" headerText="Creation time" clipMode="EllipsisWithTooltip" width="40%"></e-grid-column>
+                <e-grid-column template="#template-allow-actions" width="15%"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script type="text/javascript">
+            /** Format the date in the specified column. */
+            function formatDate(args) {
+                var salesRecordsDataGridArea = document.getElementById("data-grid-sales-record").ej2_instances[0];
+                for (var count = 0; count < salesRecordsDataGridArea.columnModel.length; count++) {
+                    if (salesRecordsDataGridArea.columnModel[count].field == "CreationTime") {
+                        salesRecordsDataGridArea.columnModel[count].format = { type: "datetime", format: "d MMMM yyyy HH:mm:ss" };
+                    }
+                }
+            };
+
+            // customise the message content of the grouping part of the data grid for listing sales records
+            ej.base.L10n.load({
+                "customised": {
+                    "grid": {
+                        "GroupDropArea": "Drag the column header \"Creation time\" here to group its column."
+                    }
+                }
+            });
+        </script>
+        <script type="text/x-template" id="template-allow-actions">
+            <a role="button" class="btn text-success grid-action" title="Delete this sales record." data-toggle="modal" data-target="#modal-deleting-confirmation-${Id}">
+                <i class="far fa-trash-alt"></i>
+            </a>
+        </script>
+    }
+    else
+    {
+        <div role="alert" class="alert alert-warning">Sorry! No sales records found.</div>
+    }
+}

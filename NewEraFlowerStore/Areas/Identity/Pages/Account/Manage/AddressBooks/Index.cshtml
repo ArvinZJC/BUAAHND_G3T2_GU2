@@ -1,0 +1,247 @@
+﻿@* the address book list page for a customer *@
+@page
+
+@model NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks.IndexModel
+
+@{
+    Layout = "~/Areas/Identity/Pages/Account/Manage/_Layout.cshtml";
+    ViewData["Title"] = "Address Books";
+    ViewData["UserCentreFunction"] = "Address books";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.AddressBooks;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    var searchDisabled = Model.UserAddressBooksCount == 0 ? "disabled" : string.Empty;
+    var noPreviousPage = !Model.MatchingAddressBookList.HasPreviousPage ? "true" : "false";
+    var noNextPage = !Model.MatchingAddressBookList.HasNextPage ? "true" : "false";
+    var previousPageDisabled = !Model.MatchingAddressBookList.HasPreviousPage ? "disabled" : string.Empty;
+    var nextPageDisabled = !Model.MatchingAddressBookList.HasNextPage ? "disabled" : string.Empty;
+
+    @section Modal {
+        @{
+            var count = 1;
+        }
+
+        @foreach (var item in Model.MatchingAddressBookList)
+        {
+            @* the maximum number of address books here should be equal to the relevant value in the back-end code *@
+            if (count++ > 10)
+            {
+                break;
+            }
+
+            <div role="dialog" id="modal-deleting-confirmation-@item.ID" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-@item.ID-title" aria-hidden="true">
+                <div role="document" class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="modal-deleting-confirmation-@item.ID-title" class="modal-title">Deleting Confirmation</h5>
+                            <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        </div>
+                        <div class="modal-body text-justify">Are you sure to delete the address book with the name "@item.BookName" permanently?</div>
+                        <div class="modal-footer">
+                            <form asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-page-handler="Delete" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-warning">Yes</button>
+                            </form>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div role="dialog" id="modal-deleting-confirmation-all" class="modal fade" tabindex="-1" aria-labelledby="modal-deleting-confirmation-all-title" aria-hidden="true">
+            <div role="document" class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 id="modal-deleting-confirmation-all-title" class="modal-title">Deleting Confirmation</h5>
+                        <a role="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </a>
+                    </div>
+                    <div class="modal-body text-justify">Are you sure to delete all address books permanently?</div>
+                    <div class="modal-footer">
+                        <form asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-page-handler="Delete" method="post">
+                            <button type="submit" class="btn btn-warning">Yes</button>
+                        </form>
+                        <button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <div role="alert" class="alert alert-warning text-justify mb-0" style="font-size: 14px">
+                <h6 class="alert-heading">Notes</h6>
+                <!-- the maximum number of address books here should be equal to the relevant value in the back-end code -->
+                <p class="text-justify mb-0">Info in an address book is used for delivery. You have to create <b>at least 1 address book</b> so that you can select one for an order, and you can have <b>at max 10 address books</b>. Your address books are displayed in ascending order by the address book name.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3 d-flex justify-content-around flex-column">
+            <form asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" method="get">
+                <div class="input-group">
+                    <input type="text" name="searchString" class="form-control" placeholder="Search for an address book" value="@Model.CurrentFilter" @searchDisabled />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-success" @searchDisabled>
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.CurrentFilter))
+            {
+                if (Model.MatchingAddressBooksCount == 0)
+                {
+                    <label class="text-justify text-danger mb-0 pt-1" style="font-size: 14px">No matching address books found. Please try another search term.</label>
+                }
+                else if (Model.MatchingAddressBooksCount == 1)
+                {
+                    <label class="text-justify text-success mb-0 pt-1" style="font-size: 14px">1 matching address book.</label>
+                }
+                else
+                {
+                    <label class="text-justify text-success mb-0 pt-1" style="font-size: 14px">@Model.MatchingAddressBooksCount matching address books.</label>
+                }
+            }
+        </div>
+    </div>
+
+    @if ((Model.MatchingAddressBookList.TotalPages == 0 && Model.CurrentPageIndex == 1) || Model.CurrentPageIndex <= Model.MatchingAddressBookList.TotalPages)
+    {
+        @* the maximum number of address books here should be equal to the relevant value in the back-end code *@
+        if (Model.UserAddressBooksCount < 10 && nextPageDisabled.Equals(string.Empty))
+        {
+            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Create" role="button" class="btn btn-success rounded-circle mr-3 mb-3" title="Create an address book.">
+                <i class="fas fa-plus"></i>
+            </a>
+        }
+
+        if (Model.UserAddressBooksCount > 1 && string.IsNullOrEmpty(Model.CurrentFilter))
+        {
+            <button type="button" class="btn btn-outline-success mb-3" data-toggle="modal" data-target="#modal-deleting-confirmation-all">
+                <i class="far fa-trash-alt pr-1"></i>
+                <span>Delete all</span>
+            </button>
+        }
+
+        <div class="row">
+            @if (Model.UserAddressBooksCount > 0)
+            {
+                var count = 1;
+
+                @foreach (var item in Model.MatchingAddressBookList)
+                {
+                    @* the maximum number of address books here should be equal to the relevant value in the back-end code *@
+                    if (count++ > 10)
+                    {
+                        break;
+                    }
+
+                    <div class="col-md-6 mb-3">
+                        <div class="e-card h-100">
+                            <div class="e-card-header pb-0">
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-header-title font-weight-bold" style="font-size: 15px">@item.BookName</div>
+                                </div>
+                            </div>
+                            <div class="e-card-content pb-1" style="line-height: 2">
+                                <div class="text-justify">@item.FirstName @item.LastName</div>
+                                <div class="text-justify text-break">@item.DetailedAddress</div>
+                                <table class="w-100" style="table-layout: fixed">
+                                    <tr>
+                                        <td>
+                                            <div class="text-justify" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingAddressBookList[0].ZipOrPostalCode)</div>
+                                        </td>
+                                        <td>
+                                            <div class="text-justify text-truncate">@item.ZipOrPostalCode</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="text-justify" style="font-weight: 500">@Html.DisplayNameFor(model => model.MatchingAddressBookList[0].PhoneNumber)</div>
+                                        </td>
+                                        <td>
+                                            <div class="text-justify text-truncate">@item.PhoneNumber</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="e-card-actions d-flex justify-content-end">
+                                <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Edit" asp-route-id="@item.ID" class="rounded-circle text-success" title="Edit this address book.">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a class="rounded-circle text-success ml-4 mr-2" style="padding-left: 7.5px; padding-right: 7.5px" title="Delete this address book." data-toggle="modal" data-target="#modal-deleting-confirmation-@item.ID">
+                                    <i class="far fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            @* the maximum number of address books here should be equal to the relevant value in the back-end code *@
+            @if (Model.UserAddressBooksCount < 10 && nextPageDisabled.Equals("disabled"))
+            {
+                <div class="col-md-6 mb-3">
+                    <div class="e-card h-100">
+                        <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Create" class="close w-100 h-100 d-flex align-items-center" title="Create an address book.">
+                            <i class="fas fa-plus py-5" style="font-size: 1.5em"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.UserAddressBooksCount > 0)
+        {
+            <div class="d-md-flex justify-content-md-between">
+                <nav>
+                    <ul class="pagination d-flex justify-content-between mb-0">
+                        <li class="page-item mr-2 @previousPageDisabled">
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="1" class="page-link e-icons icon-first d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the first page."></a>
+                        </li>
+                        <li class="page-item mr-2 @previousPageDisabled">
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@(Model.MatchingAddressBookList.PageIndex - 1)" class="page-link e-icons icon-previous d-flex align-items-center px-2" aria-disabled="@noPreviousPage" tabindex="-1" title="Go to the previous page."></a>
+                        </li>
+
+                        @for (var count = 1; count <= Model.MatchingAddressBookList.TotalPages; count++)
+                        {
+                            <!-- the page index buttons should be hidden only on a mobile device -->
+                            <li class="page-item d-none d-md-block mr-1 @(count == Model.MatchingAddressBookList.PageIndex ? "active" : string.Empty)">
+                                <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@count" class="page-link page-index rounded-circle px-2">@count</a>
+                            </li>
+                        }
+
+                        <!-- the page index navigation without the number of total items should be visible only on a mobile device -->
+                        <li class="page-index d-sm-none">@Model.MatchingAddressBookList.PageIndex of @Model.MatchingAddressBookList.TotalPages pages</li>
+                        <li class="page-item ml-1 mr-2 @nextPageDisabled">
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@(Model.MatchingAddressBookList.PageIndex + 1)" class="page-link e-icons icon-next d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the next page."></a>
+                        </li>
+                        <li class="page-item @nextPageDisabled">
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" asp-route-currentFilter="@Model.CurrentFilter" asp-route-pageIndex="@Model.MatchingAddressBookList.TotalPages" class="page-link e-icons icon-last d-flex align-items-center px-2" aria-disabled="@noNextPage" tabindex="-1" title="Go to the last page."></a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- the page index navigation with the number of total items should be hidden only on a mobile device -->
+                <div class="page-index d-none d-md-block">@Model.MatchingAddressBookList.PageIndex of @Model.MatchingAddressBookList.TotalPages pages (@(string.IsNullOrEmpty(Model.CurrentFilter) ? Model.UserAddressBooksCount : Model.MatchingAddressBooksCount) items)</div>
+            </div>
+        }
+    }
+    else
+    {
+        <div role="alert" class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <p class="text-justify mb-0">Error! No such page index.</p>
+        </div>
+    }
+}

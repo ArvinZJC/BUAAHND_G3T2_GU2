@@ -1,0 +1,15 @@
+﻿@* the status message partial view *@
+
+@model string
+
+@if (!string.IsNullOrWhiteSpace(Model))
+{
+    var statusMessageClass = Model.StartsWith("Error") ? "danger" : (Model.StartsWith("Warning") ? "warning" : "success");
+
+    <div role="alert" class="alert alert-@statusMessageClass alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <p class="text-justify mb-0">@Model</p>
+    </div>
+}

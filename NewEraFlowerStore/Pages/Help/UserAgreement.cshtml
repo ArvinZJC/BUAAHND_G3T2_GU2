@@ -1,0 +1,19 @@
+﻿@* the user agreement page *@
+@page
+
+@model UserAgreementModel
+
+@{
+    ViewData["Title"] = "User Agreement";
+    ViewData["StorePage"] = HeaderNavigation.Help;
+    ViewData["HelpPage"] = HelpMenu.UserAgreement;
+    ViewData["ReturnUrl"] = "~/Help/UserAgreement";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Help - user agreement</li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h1 class="text-center">@ViewData["Title"]</h1>
+<p class="text-justify text-black-50 mb-0">Use this page to detail New Era Flower Store's user agreement.</p>

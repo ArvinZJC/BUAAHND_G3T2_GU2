@@ -1,0 +1,123 @@
+﻿@* the page for a customer to confirm delivery info *@
+@page
+
+@model DeliveryInfoModel
+
+@{
+    Layout = "~/Areas/Identity/Pages/Account/Manage/_Layout.cshtml";
+    ViewData["Title"] = "Confirm Delivery Info";
+    ViewData["UserCentreFunction"] = "Confirm delivery info";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.Orders;
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" class="text-success text-decoration-none">Orders</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-area="Identity" asp-page="/Account/Manage/Orders/DeliveryInfo" asp-page-handler="ReadAddressBook" asp-route-orderId="@Model.CurrentOrderId" method="post">
+    <ejs-dropdownlist id="dropdown-list-address-books" cssClass="e-success mb-3" dataSource="@Model.MatchingAddressBookList" enabled="@(Model.IsEmailConfirmed && Model.MatchingAddressBooksCount > 0 ? true : false)" floatLabelType="Auto" placeholder="Select an address book" name="addressBookId">
+        <e-dropdownlist-fields text="BookName" value="ID"></e-dropdownlist-fields>
+    </ejs-dropdownlist>
+    <div class="d-md-flex justify-content-end mb-3">
+        @if (Model.MatchingAddressBooksCount > 0)
+        {
+            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="text-success text-decoration-none font-weight-bold">
+                <span>View my address books</span>
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        }
+        else
+        {
+            <span class="text-muted">At least 1 address book is required to select one for an order.&nbsp;</span>
+            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Create" class="text-success text-decoration-none font-weight-bold">
+                <span>Create one now</span>
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        }
+    </div>
+    <button type="submit" class="btn btn-success btn-block" @(Model.IsEmailConfirmed && Model.MatchingAddressBooksCount > 0 ? string.Empty : "disabled")>OK</button>
+</form>
+<div class="separator">
+    <span>Or</span>
+</div>
+<form asp-area="Identity" asp-page="/Account/Manage/Orders/DeliveryInfo" asp-route-id="@Model.CurrentOrderId" method="post">
+    <p class="text-justify">※ All fields are required, and you have to ensure the reliability of information for successful delivery.</p>
+    <div class="form-group row">
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-first-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="TopLeft">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        <input asp-for="Input.FirstName" required />
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.FirstName" class="e-float-text"></label>
+                    </div>
+                    <div class="text-justify">
+                        <span asp-validation-for="Input.FirstName" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+        <div class="col">
+            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+            <ejs-tooltip id="tooltip-last-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="TopRight">
+                <e-content-template>
+                    <div class="e-float-input e-success">
+                        <input asp-for="Input.LastName" required />
+                        <span class="e-float-line"></span>
+                        <label asp-for="Input.LastName" class="e-float-text"></label>
+                    </div>
+                    <div class="text-justify">
+                        <span asp-validation-for="Input.LastName" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                    </div>
+                </e-content-template>
+            </ejs-tooltip>
+        </div>
+    </div>
+    <div class="form-group">
+        <!-- the length here should be equal to the relevant attribute in the specified input model -->
+        <ejs-tooltip id="tooltip-detailed-address" content="At max 300 characters long." position="TopLeft">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Input.DetailedAddress" required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Input.DetailedAddress" class="e-float-text"></label>
+                </div>
+                <div class="text-justify">
+                    <span asp-validation-for="Input.DetailedAddress" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <input asp-for="Input.ZipOrPostalCode" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.ZipOrPostalCode" class="e-float-text"></label>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Input.ZipOrPostalCode" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="e-float-input e-success">
+            <input asp-for="Input.PhoneNumber" required />
+            <span class="e-float-line"></span>
+            <label asp-for="Input.PhoneNumber" class="e-float-text"></label>
+        </div>
+        <div class="e-control text-justify">
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger font-weight-bold" style="font-size: 13px"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" @(!Model.IsEmailConfirmed ? "disabled" : string.Empty)>OK</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+}

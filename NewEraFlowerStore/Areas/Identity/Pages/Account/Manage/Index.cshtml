@@ -1,0 +1,181 @@
+﻿@* the user centre home page *@
+@page
+
+@model IndexModel
+
+@{
+    ViewData["Title"] = "User Centre";
+    ViewData["StorePage"] = HeaderNavigation.UserCentre;
+    ViewData["UserCentrePage"] = UserCentreMenu.UserCentre;
+}
+
+<div class="mt-3">
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    @if (Model.DOB != null && Model.DOB == DateTime.Now)
+    {
+        <a asp-page="/Bouquets/List" asp-route-occasionId="3" class="e-card mb-3">
+            <img asp-append-version="true" src="~/img/birthday_banner.jpg" class="img-fluid" alt="Birthday Banner" />
+        </a>
+    }
+</div>
+
+<div class="row">
+    @if (!Model.IsEmailConfirmed || Model.IsAdministrator)
+    {
+        <div class="col-md"></div>
+    }
+
+    <div class="avatar-card col-md-6">
+        <div class="e-custom-card e-card">
+            <div class="e-card-header bg-light">
+                <div class="e-avatar e-avatar-circle" style="background-color: #bc8f8f">
+                    @if (Model.IsAdministrator)
+                    {
+                        <span>@Model.FirstName[0]@Model.LastName[0]</span>
+                    }
+                    else
+                    {
+                        <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + Model.AvatarUrl)" alt="Large Avatar" />
+                    }
+                </div>
+                &nbsp;
+            </div>
+            <div class="e-card-header bg-light">
+                <div class="e-card-header-caption centre">
+                    <div class="e-card-header-title name d-flex flex-column">
+                        @if (Model.IsAdministrator)
+                        {
+                            <span class="text-truncate mb-1">Store Administrator</span>
+                            <span class="text-truncate text-dark mb-2">@Model.FirstName @Model.LastName</span>
+                        }
+                        else
+                        {
+                            <span class="text-truncate mb-1">@Model.Username</span>
+
+                            @switch (Model.GenderId)
+                            {
+                                case 1:
+                                    <i class="fas fa-mars text-primary mb-2" title="Male."></i>
+                                    break;
+
+                                case 2:
+                                    <i class="fas fa-venus mb-2" style="color: #e83e8c" title="Female."></i>
+                                    break;
+
+                                default:
+                                    <i class="fas fa-venus-mars text-warning mb-2" title="You can tell us about your gender in your profile."></i>
+                                    break;
+                            }
+                        }
+                    </div>
+                    <div class="e-card-sub-title d-flex flex-column">
+                        @if (Model.IsAdministrator)
+                        {
+                            <span class="mb-2">Code: @Model.Username</span>
+                        }
+
+                        <span class="@(Model.IsEmailConfirmed ? string.Empty : "text-danger")">@Model.Email</span>
+                    </div>
+                </div>
+            </div>
+            <div class="e-card-content bg-light">
+                @if (Model.IsAdministrator)
+                {
+                    <p class="custom-card-content mb-4">
+                        <b>Phone number: </b>
+                        <span class="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "text-danger" : string.Empty)">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "(Please complete your profile)" : Model.PhoneNumber)</span>
+                    </p>
+                }
+                else
+                {
+                    <p class="custom-card-content mb-4">
+                        <b>DOB: </b>@(Model.Dob ?? "-")
+                    </p>
+                }
+
+                <p class="custom-card-content">
+                    <b>Registration time: </b>@Model.RegistrationTime
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        @if (Model.IsEmailConfirmed && !Model.IsAdministrator)
+        {
+            <!-- the space should be hidden only on a mobile device -->
+            <div class="d-none d-md-block" style="margin-top: 70px"></div>
+            <!-- the space should be visible only on a mobile device-->
+            <div class="d-sm-none mb-3"></div>
+            <div class="e-card mb-3">
+                <div class="e-card-content alert-primary text-justify" style="line-height: 2">You can turn to your <a asp-area="Identity" asp-page="/Account/Manage/Profile" class="text-decoration-none text-success">profile</a> to change your avatar, username, etc.</div>
+            </div>
+            <div class="e-card mb-3">
+                <div class="e-card-content @(Model.UserAddressBooksCount > 0 ? "alert-info" : "alert-warning") text-justify" style="line-height: 2">
+                    @if (Model.UserAddressBooksCount > 0)
+                    {
+                        <p class="mb-0">The number of address books you have:</p>
+                        <div class="d-flex flex-column">
+                            <p class="text-right font-weight-bold mb-0" style="font-size: 48px; line-height: 50px">@Model.UserAddressBooksCount</p>
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="text-decoration-none text-success text-right">
+                                <span>View all</span>
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>No address book? <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Create" class="text-decoration-none text-success">Create one now</a> to make it much more efficient to confirm delivery info.</span>
+                    }
+                </div>
+            </div>
+            <div class="e-card mb-3">
+                <div class="e-card-content @(Model.MatchingCartDetailsCount > 0 ? "alert-warning" : "alert-dark") text-justify" style="line-height: 2">
+                    @if (Model.MatchingCartDetailsCount > 0)
+                    {
+                        <p class="mb-0">The number of different bouquets in the cart:</p>
+                        <div class="d-flex flex-column">
+                            <p class="text-right font-weight-bold mb-0" style="font-size: 48px; line-height: 50px">@Model.MatchingCartDetailsCount</p>
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="text-decoration-none text-success text-right">
+                                <span>View all</span>
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                            <p class="text-justify text-danger mb-0">Remember to check out in time, or you may encounter a problem such as insufficient stocks, any bouquets off the shelves, and so on.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>The cart is empty? <a asp-page="/Bouquets/List" class="text-success text-decoration-none">Shop now</a>.</span>
+                    }
+                </div>
+            </div>
+            <div class="e-card">
+                <div class="e-card-content @(Model.IncompleteOrdersCount > 0 ? "alert-warning" : "alert-secondary") text-justify" style="line-height: 2">
+                    @if (Model.IncompleteOrdersCount > 0)
+                    {
+                        <p class="mb-0">The number of incomplete orders you have:</p>
+                        <div class="d-flex flex-column">
+                            <p class="text-right font-weight-bold mb-0" style="font-size: 48px; line-height: 50px">@Model.IncompleteOrdersCount</p>
+                            <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="text-decoration-none text-success text-right">
+                                <span>View all</span>
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                            <p class="text-justify text-danger mb-0">Remember to pay close attention on each incomplete order.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        if (Model.MatchingCartDetailsCount > 0)
+                        {
+                            <span>You do not have any incomplete orders. Why not <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Create" class="text-decoration-none text-success">turn to the cart to check out</a>?</span>
+                        }
+                        else
+                        {
+                            <span>You do not have any incomplete orders. Why not <a asp-page="/Bouquets/List" class="text-success text-decoration-none">shop now</a>?</span>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

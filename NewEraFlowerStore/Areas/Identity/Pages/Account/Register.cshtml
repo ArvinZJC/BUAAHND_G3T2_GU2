@@ -1,0 +1,128 @@
+﻿@* the register page *@
+@page
+
+@using Microsoft.AspNetCore.Identity
+
+@using NewEraFlowerStore.Data
+
+@model RegisterModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Register";
+    ViewData["StorePage"] = HeaderNavigation.Register;
+    ViewData["ReturnUrl"] = "~/Identity/Account/Register";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Account - register</li>
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <h1 class="text-center">@ViewData["Title"]</h1>
+    <p class="text-justify">To create an account, you need to <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-decoration-none text-success">log out</a> first.</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md"></div>
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="text-center">@ViewData["Title"]</h1>
+                    <hr />
+                    <form asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div class="form-group row">
+                            <div class="col">
+                                <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+                                <ejs-tooltip id="tooltip-first-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="LeftCenter">
+                                    <e-content-template>
+                                        <div class="e-float-input e-success">
+                                            <input asp-for="Input.FirstName" autofocus required />
+                                            <span class="e-float-line"></span>
+                                            <label asp-for="Input.FirstName" class="e-float-text"></label>
+                                        </div>
+                                        <div>
+                                            <span asp-validation-for="Input.FirstName" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                                        </div>
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            </div>
+                            <div class="col">
+                                <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+                                <ejs-tooltip id="tooltip-last-name" content="At least 2 and at max 25 letters long,<br />with only the 1st letter uppercase." position="RightCenter">
+                                    <e-content-template>
+                                        <div class="e-float-input e-success">
+                                            <input asp-for="Input.LastName" required />
+                                            <span class="e-float-line"></span>
+                                            <label asp-for="Input.LastName" class="e-float-text"></label>
+                                        </div>
+                                        <div>
+                                            <span asp-validation-for="Input.LastName" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                                        </div>
+                                    </e-content-template>
+                                </ejs-tooltip>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="e-float-input e-success">
+                                <!-- set the type attribute value to "text" instead of "email" to float the relevant label correctly when the email address entered is invalid -->
+                                <input asp-for="Input.Email" type="text" required />
+                                <span class="e-float-line"></span>
+                                <label asp-for="Input.Email" class="e-float-text"></label>
+                            </div>
+                            <div class="e-control">
+                                <span asp-validation-for="Input.Email" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <!-- the minimum and maximum length here should be equal to the relevant attributes in the specified input model -->
+                            <ejs-tooltip id="tooltip-password" content="1. At least 8 and at max 20 characters long.<br />2. At least 1 digit (0 - 9) and 1 letter.<br />3. No non-alphanumeric character." position="LeftCenter">
+                                <e-content-template>
+                                    <div class="e-float-input e-input-group e-success">
+                                        <input asp-for="Input.Password" required />
+                                        <span class="e-float-line"></span>
+                                        <label asp-for="Input.Password" class="e-float-text"></label>
+                                        <span id="password-eye" class="e-input-group-icon fas fa-eye-slash" title="Click to show the password." onclick="hideOrShowPassword()"></span>
+                                    </div>
+                                    <div>
+                                        <span asp-validation-for="Input.Password" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                                    </div>
+                                </e-content-template>
+                            </ejs-tooltip>
+                        </div>
+                        <div class="form-group">
+                            <div class="e-float-input e-input-group e-success">
+                                <input asp-for="Input.ConfirmPassword" required />
+                                <span class="e-float-line"></span>
+                                <label asp-for="Input.ConfirmPassword" class="e-float-text"></label>
+                                <span id="confirmation-password-eye" class="e-input-group-icon fas fa-eye-slash" title="Click to show the confirmation password." onclick="hideOrShowConfirmationPassword()"></span>
+                            </div>
+                            <div class="e-control">
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success btn-block">OK</button>
+                            <div role="alert" class="alert alert-warning mt-3 px-2 py-1">
+                                <h4 class="alert-heading">Notes</h4>
+                                <p class="text-justify mb-0">1. By creating an account, you agree to our <a asp-page="/Help/UserAgreement" class="text-decoration-none text-success" target="_blank" title="Click to read the user agreement in a new tab.">user agreement</a> and <a asp-page="/Help/PrivacyPolicy" class="text-decoration-none text-success" target="_blank" title="Click to read the privacy policy in a new tab.">privacy policy</a>.</p>
+                                <p class="text-justify mb-0">2. After creating an account successfully, please check your email to confirm your account, and pay attention that a verification email may be considered spam.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <p class="mb-0">Already a member? <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-success text-decoration-none">Log in</a>.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md"></div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScripts" />
+    }
+}

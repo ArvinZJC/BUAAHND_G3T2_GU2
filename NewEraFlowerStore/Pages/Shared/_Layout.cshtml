@@ -1,0 +1,90 @@
+﻿@* the layout of pages *@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- this is mainly for dual core browsers supported to use the WebKit rendering engine -->
+    <meta name="renderer" content="webkit">
+    <!-- this is for RWD -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+
+    @if (!string.Equals((string)ViewData["Area"], "Admin", StringComparison.OrdinalIgnoreCase))
+    {
+        <meta name="keywords" content="New Era Flower Store, online flower store, flower store, bouquet, e-commerce platform" />
+        <meta name="description" content="Buy wonderful bouquets and enjoy 5-star services at the online marketplace of New Era Flower Store!" />
+    }
+
+    <title>@ViewData["Title"] - @((string)ViewData["Area"] == "Admin" ? "Admin - " : string.Empty) New Era Flower Store</title>
+    <link href="~/img/favicon.ico" asp-append-version="true" rel="shortcut icon" />
+    <environment include="Development">
+        <link href="~/lib/bootstrap_4.3.1/dist/css/bootstrap.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/lib/fontawesome_free_5.6.3/css/all.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/lib/ej2/material.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/css/site.css" asp-append-version="true" rel="stylesheet" />
+        <script src="~/lib/ej2/ej2.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <link href="~/lib/bootstrap_4.3.1/dist/css/bootstrap.min.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/lib/fontawesome_free_5.6.3/css/all.min.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/lib/ej2/material.min.css" asp-append-version="true" rel="stylesheet" />
+        <link href="~/css/site.min.css" asp-append-version="true" rel="stylesheet" />
+        <script src="~/lib/ej2/ej2.min.js" asp-append-version="true"></script>
+    </environment>
+</head>
+<body>
+    @RenderSection("Modal", required: false)
+
+    <header>
+        <partial name="_HeaderNavigation" />
+    </header>
+    <!-- the button for scrolling to top -->
+    <button type="button" id="button-scroll-to-top" class="btn btn-success btn-lg rounded-circle shadow" title="Scroll to top.">
+        <i class="fas fa-angle-up"></i>
+    </button>
+    <div class="container main-content pt-2 @(string.Equals((string)ViewData["Area"], "Admin", StringComparison.OrdinalIgnoreCase) ? "admin-site" : string.Empty)">
+        <partial name="_CookieConsent" />
+
+        @RenderSection("Sidebar", required: false)
+
+        <main role="main" class="pb-3">
+            @if (!string.Equals((string)ViewData["Title"], "Buy Wonderful Bouquets and Enjoy 5-star Services", StringComparison.OrdinalIgnoreCase))
+            {
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb my-3 px-0 py-1 bg-light">
+                        <li class="breadcrumb-item">
+                            <a asp-page="/Index" class="text-success" title="Click to turn to the home page of the store.">
+                                <i class="fas fa-home"></i>
+                            </a>
+                        </li>
+
+                        @RenderSection("BreadcrumbItems")
+                    </ol>
+                </nav>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer">
+        <partial name="_FooterNavigation" />
+    </footer>
+
+    <environment include="Development">
+        <script src="~/lib/jquery_3.3.1/dist/jquery.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap_4.3.1/dist/js/bootstrap.bundle.js" asp-append-version="true"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery_3.3.1/dist/jquery.min.js" asp-append-version="true"></script>
+        <script src="~/lib/bootstrap_4.3.1/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    <!-- Syncfusion Essential JS 2 Script Manager -->
+    <ejs-scripts></ejs-scripts>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

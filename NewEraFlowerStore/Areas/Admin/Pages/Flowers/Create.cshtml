@@ -1,0 +1,61 @@
+﻿@* the page for creating a flower *@
+@page
+
+@model CreateModel
+
+@{
+    ViewData["Title"] = "Create Flower";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Flowers;
+    ViewData["AdminSiteMenuItem"] = "flowers";
+    ViewData["AdminSiteFunction"] = "Create";
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Admin" asp-page="/Flowers/Index" class="text-decoration-none text-success">Admin - @ViewData["AdminSiteMenuItem"]</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<form asp-area="Admin" asp-page="/Flowers/Create" method="post">
+    <div class="form-group">
+        <!-- the maximum length here should be equal to the relevant attributes in the specified model -->
+        <ejs-tooltip id="tooltip-name" content="1. At max 25 characters long, with a digit or <br />an uppercase letter as the 1st character.<br />2. Only '&', '-', '.', and spaces are <br />non-alphanumeric characters allowed." position="RightCenter">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Flower.Name" autofocus required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Flower.Name" class="e-float-text"></label>
+                </div>
+                <div>
+                    <span asp-validation-for="Flower.Name" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <div class="form-group">
+        <!-- the maximum length here should be equal to the relevant attributes in the specified model -->
+        <ejs-tooltip id="tooltip-description" content="At max 300 characters long." position="RightCenter">
+            <e-content-template>
+                <div class="e-float-input e-success">
+                    <input asp-for="Flower.Description" required />
+                    <span class="e-float-line"></span>
+                    <label asp-for="Flower.Description" class="e-float-text"></label>
+                </div>
+                <div>
+                    <span asp-validation-for="Flower.Description" class="text-danger text-justify font-weight-bold" style="font-size: 13px"></span>
+                </div>
+            </e-content-template>
+        </ejs-tooltip>
+    </div>
+    <input type="hidden" asp-for="Flower.CoverPhotoUrl" value="_default.jpg" readonly />
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" @(Model.IsEmailConfirmed ? string.Empty : "disabled")>OK</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+}

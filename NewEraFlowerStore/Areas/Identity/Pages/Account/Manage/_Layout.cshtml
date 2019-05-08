@@ -1,0 +1,214 @@
+﻿@* the layout of the user centre pages based on the layout of pages *@
+
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext StoreDbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+
+    var user = await UserManager.GetUserAsync(User);
+    var IsAdministrator = false;
+    int incompleteOrdersCount = 0;
+
+    if (user == null)
+    {
+        await SignInManager.SignOutAsync();
+    }
+    else
+    {
+        var userRoles = await UserManager.GetRolesAsync(user);
+        IsAdministrator = userRoles.Contains("Administrator");
+    }
+
+    if (!IsAdministrator)
+    {
+        incompleteOrdersCount = await StoreDbContext.Orders.Include(order => order.User).Where(order => order.UserId == user.Id && order.OrderStatusId != 9 && order.OrderStatusId != 11).CountAsync();
+    }
+}
+
+@section Modal {
+    @RenderSection("Modal", required: false)
+}
+
+@section Sidebar {
+    <!-- the user centre sidebar should be visible only on a mobile device -->
+    <ejs-sidebar type="Over" id="sidebar-user-centre" closeOnDocumentClick="true" showBackdrop="true" class="sidebar d-flex flex-column align-items-center d-sm-none">
+        <e-content-template>
+            <div class="ml-auto mr-3" style="margin-top: 5.5rem">
+                <button type="button" id="user-centre-sidebar-close-button" class="close">&times;</button>
+            </div>
+            <div class="w-100 mt-3">
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-block rounded-0 px-0 py-0 sidebar-menu-item avatar @UserCentreMenu.UserCentreMenuItem(ViewContext)" title="Click to turn to the user centre page.">
+                    <div class="e-avatar e-avatar-circle bg-success shadow my-3" style="font-size: 25px">
+                        @if (IsAdministrator)
+                        {
+                            <span>@user.FirstName[0]@user.LastName[0]</span>
+                        }
+                        else
+                        {
+                            <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + user.AvatarUrl)" alt="Medium-sized Avatar" />
+                        }
+                    </div>
+                </a>
+            </div>
+            <div class="d-flex flex-column ml-3 mr-5 mt-3">
+                <a asp-area="Identity" asp-page="/Account/Manage/Profile" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @UserCentreMenu.ProfileMenuItem(ViewContext)">
+                    <i class="fas fa-user pr-1"></i>
+                    <span>Profile</span>
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @UserCentreMenu.ChangePasswordMenuItem(ViewContext)">
+                    <i class="fas fa-unlock-alt pr-1"></i>
+                    <span>Change password</span>
+                </a>
+
+                @if (!IsAdministrator)
+                {
+                    <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @UserCentreMenu.AddressBooksMenuItem(ViewContext)">
+                        <i class="fas fa-address-book pr-1"></i>
+                        <span>Address books</span>
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item bg-transparent @UserCentreMenu.OrdersMenuItem(ViewContext)">
+                        <i class="fas fa-file-alt" style="padding-right: 0.3rem"></i>
+                        <span>Orders</span>
+
+                        @if (incompleteOrdersCount > 0)
+                        {
+                            <span class="badge badge-pill badge-success ml-1">@incompleteOrdersCount</span>
+                        }
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Manage/DeletePersonalData" class="btn rounded-0 pr-3 py-2 text-left sidebar-menu-item bg-transparent @UserCentreMenu.DeactivateAccountMenuItem(ViewContext)" style="padding-left: 0.9rem">
+                        <i class="fas fa-minus-circle pr-1"></i>
+                        <span>Deactivate account</span>
+                    </a>
+                }
+            </div>
+            <div class="ml-3 mr-auto mt-auto">
+                <a asp-area="Identity" asp-page="/Account/Logout" role="button" class="btn rounded-0 px-3 py-3 sidebar-tool">
+                    <i class="fas fa-sign-out-alt pr-1"></i>
+                    <span>Log out</span>
+                </a>
+            </div>
+        </e-content-template>
+    </ejs-sidebar>
+}
+
+@section BreadcrumbItems {
+    @if (string.Equals((string)ViewData["Title"], "User Centre", StringComparison.OrdinalIgnoreCase))
+    {
+        <li class="breadcrumb-item active" aria-current="page">User centre</li>
+    }
+    else
+    {
+        <li class="breadcrumb-item">
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="text-decoration-none text-success">User centre</a>
+        </li>
+
+        @RenderSection("AdditionalBreadcrumbItems", required: false)
+
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["UserCentreFunction"]</li>
+    }
+}
+
+<!-- the page title and the button for hiding or toggling the user centre menu should be visible only on a mobile device -->
+<div class="row d-sm-none">
+    <div class="col-auto d-flex align-items-center pr-0">
+        <a role="button" id="user-centre-menu" class="btn border-0" title="Click to show features of the user centre.">
+            <i class="fas fa-bars text-black-50"></i>
+        </a>
+        <span class="e-badge e-badge-notification e-badge-overlap bg-success text-white ml-3" style="width: 5.1rem">Click me!</span>
+    </div>
+    <div class="col d-flex align-items-center justify-content-center">
+        @if (!string.Equals((string)ViewData["Title"], "User Centre", StringComparison.OrdinalIgnoreCase))
+        {
+            <h5 class="text-truncate mb-0">@ViewData["Title"]</h5>
+        }
+    </div>
+</div>
+
+@if (!string.Equals((string)ViewData["Title"], "User Centre", StringComparison.OrdinalIgnoreCase))
+{
+    <!-- the horizontal rule should be visible only on a mobile device -->
+    <hr class="d-sm-none" />
+}
+
+<div class="row">
+    <!-- the user centre navigation should be hidden only on a mobile device -->
+    <div class="col-md-3 d-none d-md-block">
+        <div class="d-flex flex-column bg-light rounded shadow">
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn px-0 py-0 sidebar-menu-item avatar @UserCentreMenu.UserCentreMenuItem(ViewContext)" title="Click to turn to the user centre page.">
+                <div class="e-avatar e-avatar-circle bg-success shadow my-4" style="font-size: 25px">
+                    @if (IsAdministrator)
+                    {
+                        <span>@user.FirstName[0]@user.LastName[0]</span>
+                    }
+                    else
+                    {
+                        <img asp-append-version="true" src="@Url.Content("~/img/avatars/" + user.AvatarUrl)" alt="Medium-sized Avatar" />
+                    }
+                </div>
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Manage/Profile" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @UserCentreMenu.ProfileMenuItem(ViewContext)">
+                <i class="fas fa-user pr-1"></i>
+                <span>Profile</span>
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @UserCentreMenu.ChangePasswordMenuItem(ViewContext)">
+                <i class="fas fa-unlock-alt pr-1"></i>
+                <span>Change password</span>
+            </a>
+
+            @if (!IsAdministrator)
+            {
+                <a asp-area="Identity" asp-page="/Account/Manage/AddressBooks/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @UserCentreMenu.AddressBooksMenuItem(ViewContext)">
+                    <i class="fas fa-address-book pr-1"></i>
+                    <span>Address books</span>
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Orders/Index" class="btn rounded-0 px-3 py-2 text-left sidebar-menu-item @UserCentreMenu.OrdersMenuItem(ViewContext)">
+                    <i class="fas fa-file-alt" style="padding-right: 0.3rem"></i>
+                    <span>Orders</span>
+
+                    @if (incompleteOrdersCount > 0)
+                    {
+                        <span class="badge badge-pill badge-success ml-1">@incompleteOrdersCount</span>
+                    }
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Manage/DeletePersonalData" class="btn rounded-0 pr-3 py-2 text-left sidebar-menu-item @UserCentreMenu.DeactivateAccountMenuItem(ViewContext)" style="padding-left: 0.9rem">
+                    <i class="fas fa-minus-circle pr-1"></i>
+                    <span>Deactivate account</span>
+                </a>
+            }
+
+            <a asp-area="Identity" asp-page="/Account/Logout" role="button" class="btn rounded-0 mt-4 mb-2 px-3 py-2 text-left sidebar-tool">
+                <i class="fas fa-sign-out-alt pr-1"></i>
+                <span>Log out</span>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        /** Open or hide the sidebar for the user centre with the help of methods from Essential JS 2. */
+        document.addEventListener("DOMContentLoaded", function () {
+            var buttonUserCentreMenu = document.getElementById("user-centre-menu");
+            var userCentreSidebarArea = document.getElementById("sidebar-user-centre");
+            if (buttonUserCentreMenu != null && userCentreSidebarArea != null) {
+                var sidebarUserCentre = userCentreSidebarArea.ej2_instances[0];
+                buttonUserCentreMenu.onclick = function () {
+                    sidebarUserCentre.toggle(); // open the sidebar for the user centre
+                }
+                document.getElementById("user-centre-sidebar-close-button").onclick = function () {
+                    sidebarUserCentre.hide(); // close the sidebar for the user centre
+                }
+            }
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+}

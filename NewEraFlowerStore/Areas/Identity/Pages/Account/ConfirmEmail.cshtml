@@ -1,0 +1,14 @@
+﻿@page
+
+@model ConfirmEmailModel
+
+@{
+    ViewData["Title"] = "Confirm Email";
+}
+
+@section BreadcrumbItems {
+    <li class="breadcrumb-item active" aria-current="page">Account - confirm email</li>
+}
+
+<h1 class="text-center text-danger">Congratulations!</h1>
+<p class="text-justify mb-0">The account with the username "@Model.Username" has just been confirmed successfully. Thanks for confirming the email!</p>

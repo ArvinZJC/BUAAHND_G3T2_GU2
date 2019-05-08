@@ -1,0 +1,44 @@
+﻿@* the page for an administrator to change order status *@
+@page
+
+@model StatusModel
+
+@{
+    ViewData["Title"] = "Change Order Status";
+    ViewData["Area"] = "Admin";
+    ViewData["StorePage"] = HeaderNavigation.AdminSite;
+    ViewData["AdminSitePage"] = AdminSiteMenu.Orders;
+    ViewData["AdminSiteMenuItem"] = "orders";
+    ViewData["AdminSiteFunction"] = "Change order status";
+}
+
+@section AdditionalBreadcrumbItems {
+    <li class="breadcrumb-item">
+        <a asp-area="Admin" asp-page="/Orders/Index" class="text-decoration-none text-success">Admin - @ViewData["AdminSiteMenuItem"]</a>
+    </li>
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (Model.IsEmailConfirmed)
+{
+    <div role="alert" class="alert alert-warning text-justify" style="font-size: 14px">
+        <h6 class="alert-heading">Notes</h6>
+        <p class="text-justify mb-0">For the order with ID "<b>@Model.Input.Id</b>", the current order status is "<b>@Model.OrderStatusList.FirstOrDefault(orderStatusListItem => orderStatusListItem.ID == Model.Input.OrderStatusId).DisplayName</b>". The following dropdown list provides the order status that you can changed to.</p>
+    </div>
+    <form asp-area="Admin" asp-page="/Orders/Status" method="post">
+        <input type="hidden" asp-for="Input.Id" readonly />
+        <div class="form-group">
+            <ejs-dropdownlist ejs-for="@Model.Input.OrderStatusId" id="dropdown-list-order-status" cssClass="e-success" dataSource="@Model.OrderStatusList" floatLabelType="Auto" placeholder="Order status" name="Input.OrderStatusId">
+                <e-dropdownlist-fields text="DisplayName" value="ID"></e-dropdownlist-fields>
+            </ejs-dropdownlist>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success btn-block">Save</button>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScripts" />
+    }
+}
