@@ -1,4 +1,6 @@
-﻿/** Control using cookies according to the user's selection. */
+﻿// JavaScript code that the site requires
+
+/** Control using cookies according to the user's selection. */
 (function () {
     var buttonCookieConsent = document.querySelector("#cookie-consent button[data-cookie-string]");
     if (buttonCookieConsent != null) {

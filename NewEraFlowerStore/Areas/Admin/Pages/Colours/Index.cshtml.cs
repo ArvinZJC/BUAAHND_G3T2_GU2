@@ -1,3 +1,5 @@
+// csharp file that contains actions of the colour list page
+
 #region Using Directives
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +14,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Colours
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the colour list page.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -28,10 +33,17 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Colours
             _logger = logger;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A colour form.
+        /// </summary>
         public List<Colour> ColourForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -77,7 +89,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Colours
                 {
                     StatusMessage = string.Format("Error! It seems that the colour with ID \"{0}\" does not exist.", id);
                     return RedirectToPage("/Colours/Index", new { area = "Admin" });
-                }
+                } // end if
 
                 try
                 {
@@ -90,7 +102,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Colours
                 {
                     _logger.LogError(e, "Error! Failed to delete specified colour.");
                     StatusMessage = string.Format("Error! Failed to delete the colour with the name \"{0}\". You may try again.", colourToDelete.Name);
-                }
+                } // end try...catch
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

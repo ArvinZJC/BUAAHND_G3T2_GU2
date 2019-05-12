@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of a page created by Identity but actually not used in the application
+
+#region Using Directives
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,6 +8,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="LoginWithRecoveryCodeModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of a page created by Identity but actually not used in the application.
+    /// </summary>
     [AllowAnonymous]
     public class LoginWithRecoveryCodeModel : PageModel
     {

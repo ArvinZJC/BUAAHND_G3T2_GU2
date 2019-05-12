@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the order list page for a customer
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the order list page for a customer.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly OrderStatusListItem _orderStatusListItem;
@@ -36,20 +41,37 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
             OrderStatusList = _orderStatusListItem.GetOrderStatusList();
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// The number of a user's orders.
+        /// </summary>
         public int UserOrdersCount { get; set; }
-
+        /// <summary>
+        /// The number of matching orders.
+        /// </summary>
         public int MatchingOrdersCount { get; set; }
-
+        /// <summary>
+        /// ID of the current order status.
+        /// </summary>
         public int CurrentOrderStatusId { get; set; }
-
+        /// <summary>
+        /// The index of the current page.
+        /// </summary>
         public int? CurrentPageIndex { get; set; }
-
+        /// <summary>
+        /// An order status list.
+        /// </summary>
         public List<OrderStatusListItem> OrderStatusList { get; }
-
+        /// <summary>
+        /// A paginated list containing matching orders.
+        /// </summary>
         public PaginatedList<Order> MatchingOrderList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

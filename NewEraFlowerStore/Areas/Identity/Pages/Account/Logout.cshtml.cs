@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the logout page
+
+#region Using Directives
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="LogoutModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of the logout page.
+    /// </summary>
     [AllowAnonymous]
     public class LogoutModel : PageModel
     {
@@ -23,6 +28,9 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             _logger = logger;
         } // end constructor LogoutModel
 
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

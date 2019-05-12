@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for editing an address book
+
+#region Using Directives
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="EditModel"/> contains actions of the page for editing an address book.
+    /// </summary>
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -26,13 +31,22 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
             _logger = logger;
         } // end constructor EditModel
 
+        /// <summary>
+        /// ID of a user.
+        /// </summary>
         public string UserId { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="NewEraFlowerStore.Data.AddressBook"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public AddressBook AddressBook { get; set; }
 
@@ -113,8 +127,8 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
                         _logger.LogError("Error! Failed to update specified address book.");
                         StatusMessage = string.Format("Error! Failed to update the address book with the name \"{0}\". You may try again.", AddressBook.BookName);
                         return Page();
-                    }
-                }
+                    } // end if...else
+                } // end if
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

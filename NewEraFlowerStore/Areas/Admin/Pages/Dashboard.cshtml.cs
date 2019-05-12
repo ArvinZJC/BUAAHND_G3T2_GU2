@@ -1,3 +1,5 @@
+// csharp file that contains actions of the admin dashboard page
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="DashboardModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the the admin dashboard page.
+    /// </summary>
     [Authorize(Roles = "Administrator")]
     public class DashboardModel : PageModel
     {
@@ -31,42 +36,81 @@ namespace NewEraFlowerStore.Areas.Admin.Pages
             OrderStatusList = _orderStatusListItem.GetOrderStatusList();
         } // end constructor DashboardModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether it has the recent months' sales amount chart or not.
+        /// </summary>
         public bool HasRecentMonthsSalesAmountChart { get; set; }
-
+        /// <summary>
+        /// Running days of the online store.
+        /// </summary>
         public int RunningDays { get; set; }
-
+        /// <summary>
+        /// Running months of the online store.
+        /// </summary>
         public int RunningMonths { get; set; }
-
+        /// <summary>
+        /// The number of registered customers.
+        /// </summary>
         public int RegisteredCustomersCount { get; set; }
-
+        /// <summary>
+        /// The number of colours.
+        /// </summary>
         public int ColoursCount { get; set; }
-
+        /// <summary>
+        /// The number of flowers.
+        /// </summary>
         public int FlowersCount { get; set; }
-
+        /// <summary>
+        /// The number of occasions.
+        /// </summary>
         public int OccasionsCount { get; set; }
-
+        /// <summary>
+        /// The number of bouquets sold out.
+        /// </summary>
         public int BouquetsSoldOutCount { get; set; }
-
+        /// <summary>
+        /// The total sales amount.
+        /// </summary>
         public decimal TotalSalesAmount { get; set; }
-
+        /// <summary>
+        /// The sales amount of 1 month interval.
+        /// </summary>
         public decimal SalesAmount1 { get; set; }
-
+        /// <summary>
+        /// An order status list.
+        /// </summary>
         public List<OrderStatusListItem> OrderStatusList { get; set; }
-
+        /// <summary>
+        /// Data for the recently registered customer chart.
+        /// </summary>
         public List<object> RecentlyRegisteredCustomersChart { get; set; }
-
+        /// <summary>
+        /// Data for the bouquet chart (sort by colour).
+        /// </summary>
         public List<object> SortByColourChart { get; set; }
-
+        /// <summary>
+        /// Data for the bouquet chart (sort by flower).
+        /// </summary>
         public List<object> SortByFlowerChart { get; set; }
-
+        /// <summary>
+        /// Data for the bouquet chart (sort by occasion).
+        /// </summary>
         public List<object> SortByOccasionChart { get; set; }
-
+        /// <summary>
+        /// Data for the incomplete order form.
+        /// </summary>
         public List<object> IncompleteOrdersForm { get; set; }
-
+        /// <summary>
+        /// Data for the recent months' sales amount chart.
+        /// </summary>
         public List<object> RecentMonthsSalesAmountChart { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

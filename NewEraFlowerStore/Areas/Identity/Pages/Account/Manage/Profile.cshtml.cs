@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the user profile page
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="ProfileModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the user profile page.
+    /// </summary>
     public class ProfileModel : PageModel
     {
         private readonly GenderListItem _genderListItem;
@@ -38,19 +43,34 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             GenderList = _genderListItem.GetGenderList();
         } // end constructor ProfileModel
 
+        /// <summary>
+        /// The URL of the avatar file.
+        /// </summary>
         public string AvatarUrl { get; set; }
-
+        /// <summary>
+        /// The email address.
+        /// </summary>
         public string Email { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether the login user is an administrator or not.
+        /// </summary>
         public bool IsAdministrator { get; set; }
-
+        /// <summary>
+        /// A gender list.
+        /// </summary>
         public List<GenderListItem> GenderList { get; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -163,7 +183,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                     StatusMessage = string.Format("Error! To fully experience our services, you must verify your email address \"{0}\". Please pay attention that a verification email may be considered spam.", Email);
 
                 return Page();
-            }
+            } // end if
 
             var isChanged = false;
             
@@ -175,7 +195,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                 {
                     ModelState.AddModelError("Input.Email", "Failed to set the email address.");
                     return Page();
-                }
+                } // end if
 
                 isChanged = true;
             }
@@ -183,25 +203,25 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             {
                 StatusMessage = string.Format("Error! To fully experience our services, you must verify your email address \"{0}\". Please pay attention that a verification email may be considered spam.", Email);
                 return Page();
-            }
+            } // end nested if...else
 
             if (user.FirstName != Input.FirstName)
             {
                 user.FirstName = Input.FirstName;
                 isChanged = true;
-            } 
+            } // end if
 
             if (user.LastName != Input.LastName)
             {
                 user.LastName = Input.LastName;
                 isChanged = true;
-            } 
+            } // end if
 
             if (user.UserName != Input.Username)
             {
                 user.UserName = Input.Username;
                 isChanged = true;
-            }
+            } // end if
 
             if (IsAdministrator)
             {
@@ -209,13 +229,13 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                 {
                     user.GenderId = null;
                     isChanged = true;
-                }
+                } // end if
             }
             else if (user.GenderId != Input.GenderId && _genderListItem.IsValidId(Input.GenderId))
             {
                 user.GenderId = Input.GenderId;
                 isChanged = true;
-            }
+            } // end nested if...else
 
             if (IsAdministrator)
             {
@@ -223,13 +243,13 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                 {
                     user.DOB = null;
                     isChanged = true;
-                }
+                } // end if
             }
             else if (user.DOB != Input.DOB)
             {
                 user.DOB = Input.DOB;
                 isChanged = true;
-            }
+            } // end nested if...else
 
             var validPhoneNumberContent = string.IsNullOrWhiteSpace(Input.PhoneNumber) ? null : Input.PhoneNumber.Trim();
 
@@ -241,10 +261,10 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                 {
                     ModelState.AddModelError("Input.PhoneNumber", "Failed to set the phone number.");
                     return Page();
-                }
+                } // end if
 
                 isChanged = true;
-            }
+            } // end if
 
             if (isChanged)
             {
@@ -262,8 +282,8 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                     _logger.LogError("Error! Failed to update profile.");
 
                     StatusMessage = "Error! Failed to update your profile. You may try again.";
-                }
-            }
+                } // end if...else
+            } // end if
 
             return Page();
         } // end method OnPostSaveAsync
@@ -319,7 +339,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                 $"<p>For info on New Era Flower Store's privacy policy, please visit \"<a href='{HtmlEncoder.Default.Encode(privacyPolicyUrl)}'>{HtmlEncoder.Default.Encode(privacyPolicyUrl)}</a>\". This email message was auto-generated. Please do not respond.</p>" +
                 $"<p>New Era Flower Store</p>" +
                 $"<hr />" +
-                $"<p>©2018-{DateTimeOffset.Now.Year} SHIELD Technology, Inc.</p>");
+                $"<p>©2019 SHIELD Technology, Inc.</p>");
 
             StatusMessage = "To confirm your email, a verification email has been sent. Please check your email, and pay attention that a verification email may be considered spam.";
 

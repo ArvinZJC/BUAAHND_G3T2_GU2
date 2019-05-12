@@ -1,3 +1,5 @@
+// csharp file that contains actions of the order detail page for a customer
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="DetailsModel"/> contains actions of the order detail page for a customer.
+    /// </summary>
     public class DetailsModel : PageModel
     {
         private readonly OrderStatusListItem _orderStatusListItem;
@@ -35,20 +40,37 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
             OrderStatusList = _orderStatusListItem.GetOrderStatusList();
         } // end constructor DetailsModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// ID of the current order.
+        /// </summary>
         public int? CurrentOrderId { get; set; }
-
+        /// <summary>
+        /// The number of matching order details.
+        /// </summary>
         public int MatchingOrderDetailsCount { get; set; }
-
+        /// <summary>
+        /// The subtotal of an order.
+        /// </summary>
         public decimal Subtotal { get; set; }
-
+        /// <summary>
+        /// A matching <see cref="Order"/> object.
+        /// </summary>
         public Order MatchingOrder { get; set; }
-
+        /// <summary>
+        /// An order status list.
+        /// </summary>
         public List<OrderStatusListItem> OrderStatusList { get; }
-
+        /// <summary>
+        /// A matching order detail list.
+        /// </summary>
         public IList<OrderDetail> MatchingOrderDetailList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

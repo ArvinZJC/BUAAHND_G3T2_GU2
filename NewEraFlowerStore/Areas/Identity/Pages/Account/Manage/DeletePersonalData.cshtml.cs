@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for deactivating the account
+
+#region Using Directives
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,6 +18,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="ChangePasswordModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the page for deactivating the account.
+    /// </summary>
     [Authorize(Roles = "Customer")]
     public class DeletePersonalDataModel : PageModel
     {
@@ -39,6 +44,18 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         } // end constructor DeletePersonalDataModel
 
+        /// <summary>
+        /// The number of incomplete orders.
+        /// </summary>
+        public int IncompleteOrdersCount { get; set; }
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
+        [TempData]
+        public string StatusMessage { get; set; }
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -56,11 +73,6 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             [RegularExpression(@"^(?![0-9]+$)(?![A-Za-z]+$)[0-9A-Za-z]{8,20}$", ErrorMessage = "Please enter a valid password.")]
             public string Password { get; set; }
         } // end class InputModel
-
-        public int IncompleteOrdersCount { get; set; }
-
-        [TempData]
-        public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -103,7 +115,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                     {
                         ModelState.AddModelError("Input.Password", "Wrong password.");
                         return Page();
-                    }
+                    } // end if
 
                     if (user.AvatarUrl != "_default.jpg")
                     {
@@ -125,8 +137,8 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
 
                             _logger.LogError(e, "Error! Failed to delete avatar file.");
                             return Page();
-                        }
-                    }
+                        } // end try...catch
+                    } // end if
 
                     var result = await _userManager.DeleteAsync(user);
                     var username = await _userManager.GetUserNameAsync(user);
@@ -137,12 +149,12 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
                         _logger.LogInformation("Specified account has been deactivated successfully.");
                         StatusMessage = string.Format("The account with the username \"{0}\" has been deactivated.", username);
                         return LocalRedirect("~/");
-                    }
+                    } // end if
 
                     _logger.LogError("Error! Failed to deactivate account.");
 
                     StatusMessage = "Error! Failed to deactivate your account. You may try again.";
-                }
+                } // end if
             }
             else
                 StatusMessage = "Error! You cannot deactivate your account because you have at least 1 incomplete order.";

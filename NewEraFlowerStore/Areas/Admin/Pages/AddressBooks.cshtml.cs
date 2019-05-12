@@ -1,3 +1,5 @@
+// csharp file that contains actions of the address book list page for an administrator
+
 #region Using Directives
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,6 +15,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="AddressBooksModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the address book list page for an administrator.
+    /// </summary>
     [Authorize(Roles = "Administrator")]
     public class AddressBooksModel : PageModel
     {
@@ -30,10 +35,17 @@ namespace NewEraFlowerStore.Areas.Admin.Pages
             _logger = logger;
         } // end constructor AddressBooksModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// An address book form.
+        /// </summary>
         public List<object> AddressBookForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

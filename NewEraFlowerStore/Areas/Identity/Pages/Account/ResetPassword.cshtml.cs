@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for resetting the password
+
+#region Using Directives
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +14,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="ResetPasswordModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of the page for resetting the password.
+    /// </summary>
     [AllowAnonymous]
     public class ResetPasswordModel : PageModel
     {
@@ -24,9 +29,14 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             _logger = logger;
         } // end constructor ResetPasswordModel
 
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -104,7 +114,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             {
                 _logger.LogError("Error! Failed to reset password for specified user.");
                 StatusMessage = string.Format("Error! Failed to reset the password for the user named \"{0}\".", user.UserName);
-            }
+            } // end if...else
 
             return Page();
         } // end method OnPostAsync

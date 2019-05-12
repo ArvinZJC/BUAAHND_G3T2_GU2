@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the register page
+
+#region Using Directives
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="RegisterModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of the register page.
+    /// </summary>
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
@@ -35,8 +40,13 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         } // end constructor RegisterModel
 
+        /// <summary>
+        /// The URL of the page to return to.
+        /// </summary>
         public string ReturnUrl { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -105,7 +115,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
                     AvatarUrl = "_default.jpg",
                     FirstName = Input.FirstName,
                     LastName = Input.LastName,
-                    UserName = await CreateUsernameAsync(Input.FirstName, Input.LastName),
+                    UserName = await CreateUsernameAsync(Input.FirstName, Input.LastName), // call the specified method to create a username with the first name, last name, and creation time
                     Email = Input.Email,
                     RegistrationTime = DateTimeOffset.Now
                 };
@@ -139,7 +149,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
                             $"<p>For info on New Era Flower Store's privacy policy, please visit \"<a href='{HtmlEncoder.Default.Encode(privacyPolicyUrl)}'>{HtmlEncoder.Default.Encode(privacyPolicyUrl)}</a>\". This email message was auto-generated. Please do not respond.</p>" +
                             $"<p>New Era Flower Store</p>" +
                             $"<hr />" +
-                            $"<p>©2018-{DateTimeOffset.Now.Year} SHIELD Technology, Inc.</p>"); // send a verification email for confirming the account
+                            $"<p>©2019 SHIELD Technology, Inc.</p>"); // send a verification email for confirming the account
                         await _signInManager.SignInAsync(user, isPersistent: false); // automatically log in after registering successfully, and the login cookie should not persist after the browser is closed
                         return LocalRedirect(ReturnUrl);
                     }
@@ -169,6 +179,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             return Page();
         } // end method OnPostAsync
 
+        // create a username with the first name, last name, and creation time
         private async Task<string> CreateUsernameAsync(string firstName, string lastName)
         {
             string username;

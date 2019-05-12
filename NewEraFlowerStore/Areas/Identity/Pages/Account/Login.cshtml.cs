@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the login page
+
+#region Using Directives
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Services;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="LoginModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of the login page.
+    /// </summary>
     [AllowAnonymous]
     public class LoginModel : PageModel
     {
@@ -35,8 +40,13 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             _logger = logger;
         } // end constructor LoginModel
 
+        /// <summary>
+        /// The URL of the page to return to.
+        /// </summary>
         public string ReturnUrl { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 

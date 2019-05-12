@@ -1,3 +1,5 @@
+// csharp file that contains actions of the page for an administrator to edit delivery info
+
 #region Using Directives
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +15,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Orders
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="DeliveryInfoModel"/> contains actions of the page for an administrator to edit delivery info.
+    /// </summary>
     public class DeliveryInfoModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -29,13 +34,22 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Orders
             _logger = logger;
         } // end constructor DeliveryInfoModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// The current order ID.
+        /// </summary>
         public int? CurrentOrderId { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 

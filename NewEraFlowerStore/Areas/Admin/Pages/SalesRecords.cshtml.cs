@@ -1,3 +1,5 @@
+// csharp file that contains actions of the sales record list page
+
 #region Using Directives
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="SalesRecordsModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the sales record list page.
+    /// </summary>
     [Authorize(Roles = "Administrator")]
     public class SalesRecordsModel : PageModel
     {
@@ -31,12 +36,21 @@ namespace NewEraFlowerStore.Areas.Admin.Pages
             _logger = logger;
         } // end constructor SalesRecordsModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A sales record list.
+        /// </summary>
         public List<SalesRecord> SalesRecordList { get; set; }
-
+        /// <summary>
+        /// A sales record form.
+        /// </summary>
         public List<object> SalesRecordForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

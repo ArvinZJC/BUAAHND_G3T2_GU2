@@ -1,3 +1,5 @@
+// csharp file that contains actions of the page for listing other administrators
+
 #region Using Directives
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +13,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.OtherAdministrators
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the page for listing other administrators.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -27,12 +32,21 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.OtherAdministrators
             _logger = logger;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A list containing other administrators.
+        /// </summary>
         public List<ApplicationUser> OtherAdministratorList { get; set; }
-
+        /// <summary>
+        /// A form containing other administrators.
+        /// </summary>
         public List<object> OtherAdministratorForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

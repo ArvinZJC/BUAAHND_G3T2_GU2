@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for creating an address book
+
+#region Using Directives
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +14,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="CreateModel"/> contains actions of the page for creating an address book.
+    /// </summary>
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -28,13 +33,22 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
             _logger = logger;
         } // end constructor CreateModel
 
+        /// <summary>
+        /// ID of a user.
+        /// </summary>
         public string UserId { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="NewEraFlowerStore.Data.AddressBook"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public AddressBook AddressBook { get; set; }
 

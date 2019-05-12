@@ -1,3 +1,5 @@
+// csharp file that contains actions of the order list page for an administrator
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Orders
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the order list page for an administrator.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly OrderStatusListItem _orderStatusListItem;
@@ -35,12 +40,18 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Orders
             OrderStatusList = _orderStatusListItem.GetOrderStatusList();
         } // end constructor IndexModel
 
-        public bool IsEmailConfirmed { get; set; }
-
-        public List<object> OrderForm { get; set; }
-
         private List<OrderStatusListItem> OrderStatusList { get; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
+        public bool IsEmailConfirmed { get; set; }
+        /// <summary>
+        /// An order form.
+        /// </summary>
+        public List<object> OrderForm { get; set; }
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

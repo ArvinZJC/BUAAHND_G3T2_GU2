@@ -1,3 +1,5 @@
+// csharp file that contains actions of the bouquet list page for an administrator
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the bouquet list page for an administrator.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -34,12 +39,21 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
             _logger = logger;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A bouquet list.
+        /// </summary>
         public List<Bouquet> BouquetList { get; set; }
-
+        /// <summary>
+        /// A bouquet form.
+        /// </summary>
         public List<object> BouquetForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -80,7 +94,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                         item.PhotoUrl1,
                         item.PhotoUrl2
                     });
-                }
+                } // end foreach
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);
@@ -108,7 +122,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                 {
                     StatusMessage = string.Format("Error! It seems that the bouquet with ID \"{0}\" does not exist.", id);
                     return RedirectToPage("/Bouquets/Index", new { area = "Admin" });
-                }
+                } // end if
 
                 if (bouquetToDelete.PhotoUrl1 != "_default1.jpg")
                 {
@@ -129,8 +143,8 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                         _logger.LogError(e, "Error! Failed to delete Photo 1.");
                         StatusMessage = string.Format("Error! Failed to delete Photo 1 when deleting the bouquet with the name \"{0}\". You may try again.", bouquetToDelete.Name);
                         return RedirectToPage("/Bouquets/Index", new { area = "Admin" });
-                    }
-                }
+                    } // end try...catch
+                } // end if
 
                 if (bouquetToDelete.PhotoUrl2 != "_default2.jpg")
                 {
@@ -151,8 +165,8 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                         _logger.LogError(e, "Error! Failed to delete Photo 2.");
                         StatusMessage = string.Format("Error! Failed to delete Photo 2 when deleting the bouquet with the name \"{0}\". You may try again.", bouquetToDelete.Name);
                         return RedirectToPage("/Bouquets/Index", new { area = "Admin" });
-                    }
-                }
+                    } // end try...catch
+                } // end if
 
                 try
                 {
@@ -165,7 +179,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                 {
                     _logger.LogError(e, "Error! Failed to delete specified bouquet.");
                     StatusMessage = string.Format("Error! Failed to delete the bouquet with the name \"{0}\". You may try again.", bouquetToDelete.Name);
-                }
+                } // end try...catch
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

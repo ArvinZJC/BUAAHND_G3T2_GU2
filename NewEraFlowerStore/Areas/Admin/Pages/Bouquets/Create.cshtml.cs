@@ -1,3 +1,5 @@
+// csharp file that contains actions of the page for creating a bouquet
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="CreateModel"/> contains actions of the page for creating a bouquet.
+    /// </summary>
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -30,19 +35,34 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
             _logger = logger;
         } // end constructor CreateModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether the date and time is default.
+        /// </summary>
         public bool IsDefaultDateTime { get; set; }
-
+        /// <summary>
+        /// A colour list.
+        /// </summary>
         public IList<Colour> ColourList { get; set; }
-
+        /// <summary>
+        /// A flower list.
+        /// </summary>
         public IList<Flower> FlowerList { get; set; }
-
+        /// <summary>
+        /// An occasion list.
+        /// </summary>
         public IList<Occasion> OccasionList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// A <see cref="NewEraFlowerStore.Data.Bouquet"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public Bouquet Bouquet { get; set; }
 
@@ -95,7 +115,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                     ModelState.AddModelError("Bouquet.LaunchDate", "Please select a launch date.");
 
                     isValid = false;
-                }  
+                } // end if
 
                 if (Bouquet.ColourId <= 0 || (Bouquet.ColourId > 0 && await _context.Colours.FindAsync(Bouquet.ColourId) == null))
                 {
@@ -103,7 +123,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.ColourId = 0;
                     isValid = false;
-                }
+                } // end if
 
                 if (Bouquet.FlowerId <= 0 || (Bouquet.FlowerId > 0 && await _context.Flowers.FindAsync(Bouquet.FlowerId) == null))
                 {
@@ -111,7 +131,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.FlowerId = 0;
                     isValid = false;
-                }
+                } // end if
 
                 if (Bouquet.OccasionId <= 0 || (Bouquet.OccasionId > 0 && await _context.Occasions.FindAsync(Bouquet.OccasionId) == null))
                 {
@@ -119,7 +139,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.OccasionId = 0;
                     isValid = false;
-                }
+                } // end if
 
                 if (Bouquet.OriginalPrice < 0.01M || Bouquet.OriginalPrice > 999.99M)
                 {
@@ -127,7 +147,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.OriginalPrice = 0.01M;
                     isValid = false;
-                }
+                } // end if
 
                 if (Bouquet.Discount < 0M || Bouquet.Discount > 0.99M)
                 {
@@ -135,7 +155,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.Discount = 0M;
                     isValid = false;
-                }
+                } // end if
 
                 if (Bouquet.Stocks < 0)
                 {
@@ -143,7 +163,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
 
                     Bouquet.Stocks = 0;
                     isValid = false;
-                }
+                } // end if
 
                 if (!ModelState.IsValid)
                     return Page();
@@ -182,12 +202,12 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Bouquets
                     _logger.LogInformation("Specified bouquet has been created successfully.");
                     StatusMessage = string.Format("A bouquet with the name \"{0}\" has been created.", Bouquet.Name);
                     return RedirectToPage("/Bouquets/Index", new { area = "Admin" });
-                }
+                } // end if
 
                 _logger.LogError("Error! Failed to create specified bouquet.");
                 StatusMessage = string.Format("Error! Failed to create a bouquet with the name \"{0}\". You may try again.", Bouquet.Name);
                 return Page();
-            }
+            } // end if
 
             StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);
             return Page();

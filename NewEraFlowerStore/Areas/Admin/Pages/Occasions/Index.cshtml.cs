@@ -1,3 +1,5 @@
+// csharp file that contains actions of the occasion list page
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the occasion list page.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -33,10 +38,17 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
             _logger = logger;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// An occasion form.
+        /// </summary>
         public List<Occasion> OccasionForm { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -82,7 +94,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
                 {
                     StatusMessage = string.Format("Error! It seems that the occasion with ID \"{0}\" does not exist.", id);
                     return RedirectToPage("/Occasions/Index", new { area = "Admin" });
-                }
+                } // end if
 
                 if (occasionToDelete.CoverPhotoUrl != "_default.jpg")
                 {
@@ -103,8 +115,8 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
                         _logger.LogError(e, "Error! Failed to delete cover photo.");
                         StatusMessage = string.Format("Error! Failed to delete the cover photo when deleting the occasion with the name \"{0}\". You may try again.", occasionToDelete.Name);
                         return RedirectToPage("/Occasions/Index", new { area = "Admin" });
-                    }
-                }
+                    } // end try...catch
+                } // end if
 
                 try
                 {
@@ -117,7 +129,7 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
                 {
                     _logger.LogError(e, "Error! Failed to delete specified occasion.");
                     StatusMessage = string.Format("Error! Failed to delete the occasion with the name \"{0}\". You may try again.", occasionToDelete.Name);
-                }
+                } // end try...catch
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

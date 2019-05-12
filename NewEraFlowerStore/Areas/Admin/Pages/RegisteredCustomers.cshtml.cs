@@ -1,3 +1,5 @@
+// csharp file that contains actions of the registered customer list page
+
 #region Using Directives
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="RegisteredCustomersModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the registered customer list page.
+    /// </summary>
     [Authorize(Roles = "Administrator")]
     public class RegisteredCustomersModel : PageModel
     {
@@ -40,14 +45,22 @@ namespace NewEraFlowerStore.Areas.Admin.Pages
             GenderList = _genderListItem.GetGenderList();
         } // end constructor RegisteredCustomersModel
 
-        public bool IsEmailConfirmed { get; set; }
-
-        public List<ApplicationUser> RegisteredCustomerList { get; set; }
-
-        public List<object> RegisteredCustomerForm { get; set; }
-
         private List<GenderListItem> GenderList { get; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
+        public bool IsEmailConfirmed { get; set; }
+        /// <summary>
+        /// A registered customer list.
+        /// </summary>
+        public List<ApplicationUser> RegisteredCustomerList { get; set; }
+        /// <summary>
+        /// A registered customer form.
+        /// </summary>
+        public List<object> RegisteredCustomerForm { get; set; }
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

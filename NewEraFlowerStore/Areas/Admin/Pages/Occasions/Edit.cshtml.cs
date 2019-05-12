@@ -1,3 +1,5 @@
+// csharp file that contains actions of the page for editing an occasion
+
 #region Using Directives
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +12,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="EditModel"/> contains actions of the page for editing an occasion.
+    /// </summary>
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -26,13 +31,22 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
             _logger = logger;
         } // end constructor EditModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// The URL of a cover photo.
+        /// </summary>
         public string CoverPhotoUrl { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="NewEraFlowerStore.Data.Occasion"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public Occasion Occasion { get; set; }
 
@@ -106,8 +120,8 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.Occasions
                         StatusMessage = string.Format("Error! Failed to update the occasion with the name \"{0}\". You may try again.", Occasion.Name);
                         Occasion = await _context.Occasions.FindAsync(Occasion.ID);
                         return Page();
-                    }
-                }
+                    } // end if...else
+                } // end if
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the address book list page for a customer
+
+#region Using Directives
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> contains actions of the address book list page for a customer.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -30,21 +35,38 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
             _logger = logger;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// The number of address books owned by a user.
+        /// </summary>
         public int UserAddressBooksCount { get; set; }
-
+        /// <summary>
+        /// The number of matching address books.
+        /// </summary>
         public int MatchingAddressBooksCount { get; set; }
-
+        /// <summary>
+        /// The index of the current page.
+        /// </summary>
         public int? CurrentPageIndex { get; set; }
-
+        /// <summary>
+        /// The current filter.
+        /// </summary>
         public string CurrentFilter { get; set; }
-
+        /// <summary>
+        /// A paginated list containing matching address books.
+        /// </summary>
         public PaginatedList<AddressBook> MatchingAddressBookList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="NewEraFlowerStore.Data.AddressBook"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         private AddressBook AddressBook { get; set; }
 
@@ -86,7 +108,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
                             || addressBook.ZipOrPostalCode.Contains(CurrentFilter)
                             || addressBook.PhoneNumber.Contains(CurrentFilter));
                         MatchingAddressBooksCount = await matchingAddressBooks.CountAsync();
-                    }
+                    } // end if
 
                     matchingAddressBooks = matchingAddressBooks.OrderBy(addressBook => addressBook.BookName);
 
@@ -97,7 +119,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
                     // the relevant back-end code in this class and code in the address book list page need updating after modifying the value in the condition
                     if (UserAddressBooksCount > 10)
                         StatusMessage = string.Format("Error! You have {0} address books which exceed the limit. Only 10 of them are displayed. Please delete some.", UserAddressBooksCount);
-                }
+                } // end if
 
                 int pageSize = 4; // the code of pagination in the address book list page needs improving after modifying the page size
 
@@ -143,7 +165,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
                     {
                         _logger.LogError(e, "Error! Failed to delete specified address book.");
                         StatusMessage = string.Format("Error! Failed to delete the address book with the name \"{0}\". You may try again.", AddressBook.BookName);
-                    }
+                    } // end try...catch
                 }
                 else
                 {
@@ -162,8 +184,8 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.AddressBooks
                     {
                         _logger.LogError(e, "Error! Failed to delete all address books.");
                         StatusMessage = "Error! Failed to delete all address books. You may try again.";
-                    }
-                }
+                    } // end try...catch
+                } // end if...else
             }
             else
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);

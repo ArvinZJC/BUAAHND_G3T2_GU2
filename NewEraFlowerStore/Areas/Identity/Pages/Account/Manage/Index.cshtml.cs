@@ -1,3 +1,5 @@
+// csharp file that contains actions of the user centre home page
+
 #region Using Directives
 using System;
 using System.Globalization;
@@ -13,6 +15,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="IndexModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the user centre home page.
+    /// </summary>
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -24,36 +29,69 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
         } // end constructor IndexModel
 
+        /// <summary>
+        /// The first name.
+        /// </summary>
         public string FirstName { get; set; }
-
+        /// <summary>
+        /// The last name.
+        /// </summary>
         public string LastName { get; set; }
-
+        /// <summary>
+        /// The URL of the avatar file.
+        /// </summary>
         public string AvatarUrl { get; set; }
-
+        /// <summary>
+        /// The username.
+        /// </summary>
         public string Username { get; set; }
-
+        /// <summary>
+        /// ID of a gender.
+        /// </summary>
         public int? GenderId { get; set; }
-
+        /// <summary>
+        /// The email address.
+        /// </summary>
         public string Email { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether the login user is an administrator or not.
+        /// </summary>
         public bool IsAdministrator { get; set; }
-
+        /// <summary>
+        /// The date of birth.
+        /// </summary>
         public DateTime? DOB { get; set; }
-
+        /// <summary>
+        /// The string representation of the date of birth.
+        /// </summary>
         public string Dob { get; set; }
-
+        /// <summary>
+        /// The phone number.
+        /// </summary>
         public string PhoneNumber { get; set; }
-
+        /// <summary>
+        /// The registration time.
+        /// </summary>
         public string RegistrationTime { get; set; }
-
+        /// <summary>
+        /// The number of address books owned by a user.
+        /// </summary>
         public int UserAddressBooksCount { get; set; }
-
+        /// <summary>
+        /// The number of matching cart details.
+        /// </summary>
         public int MatchingCartDetailsCount { get; set; }
-
+        /// <summary>
+        /// The number of incomplete orders.
+        /// </summary>
         public int IncompleteOrdersCount { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

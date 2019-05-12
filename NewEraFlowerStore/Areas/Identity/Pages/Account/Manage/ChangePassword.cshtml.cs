@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for changing the password
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="ChangePasswordModel"/> contains actions of the page for changing the password.
+    /// </summary>
     public class ChangePasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -31,11 +36,18 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             _logger = logger;
         } // end constructor ChangePasswordModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -103,7 +115,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             {
                 StatusMessage = string.Format("Error! Your email address \"{0}\" has not been verified. Please verify it from your profile.", user.Email);
                 return Page();
-            }
+            } // end if
 
             if (!ModelState.IsValid)
                 return Page();
@@ -114,7 +126,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
             {
                 ModelState.AddModelError("Input.OldPassword", "Wrong password.");
                 return Page();
-            }
+            } // end if
 
             await _signInManager.RefreshSignInAsync(user);
             _logger.LogInformation("User changed password successfully.");
@@ -163,7 +175,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage
         /// <summary>
         /// Provide support for the client-side unobtrusive validation.
         /// </summary>
-        /// <param name="context">The context for the client-side model validation.</param>
+        /// <param name="context">the context for the client-side model validation</param>
         public void AddValidation(ClientModelValidationContext context)
         {
             if (context == null)

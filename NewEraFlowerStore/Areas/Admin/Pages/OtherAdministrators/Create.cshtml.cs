@@ -1,3 +1,5 @@
+// csharp file that contains actions of the page for creating an administrator account
+
 #region Using Directives
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -12,6 +14,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Admin.Pages.OtherAdministrators
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="DeliveryInfoModel"/> contains actions of the page for creating an administrator account.
+    /// </summary>
     public class CreateModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -25,11 +30,18 @@ namespace NewEraFlowerStore.Areas.Admin.Pages.OtherAdministrators
             _logger = logger;
         } // end constructor CreateModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 

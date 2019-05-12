@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the page for a customer to confirm delivery info
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +17,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="DeliveryInfoModel"/> contains actions of the page for a customer to confirm delivery info.
+    /// </summary>
     public class DeliveryInfoModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -31,17 +36,30 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account.Manage.Orders
             _logger = logger;
         } // end constructor DeliveryInfoModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// ID of the current order.
+        /// </summary>
         public int? CurrentOrderId { get; set; }
-
+        /// <summary>
+        /// The number of matching address books.
+        /// </summary>
         public int MatchingAddressBooksCount { get; set; }
-
+        /// <summary>
+        /// A matching address book list.
+        /// </summary>
         public IList<AddressBook> MatchingAddressBookList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 

@@ -1,5 +1,6 @@
-﻿#region Using Directives
-using System;
+﻿// csharp file that contains actions of the page for sending a verification email to reset the password
+
+#region Using Directives
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Areas.Identity.Pages.Account
 {
+    /// <summary>
+    /// Extending from class <see cref="PageModel"/>, the class <see cref="ForgotPasswordModel"/> decorated with <see cref="AllowAnonymousAttribute"/> contains actions of the page for sending a verification email to reset the password.
+    /// </summary>
     [AllowAnonymous]
     public class ForgotPasswordModel : PageModel
     {
@@ -26,9 +30,14 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         } // end constructor ForgotPasswordModel
 
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-
+        /// <summary>
+        /// An <see cref="InputModel"/> object decorated with <see cref="BindPropertyAttribute"/>.
+        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -58,7 +67,7 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
                 {
                     ModelState.AddModelError("Input.UsernameOrEmail", "The user does not exist.");
                     return Page();
-                }
+                } // end if
 
                 var privacyPolicyUrl = Url.Page(
                     "/Help/PrivacyPolicy",
@@ -91,12 +100,12 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
                         $"<p>For info on New Era Flower Store's privacy policy, please visit \"<a href='{HtmlEncoder.Default.Encode(privacyPolicyUrl)}'>{HtmlEncoder.Default.Encode(privacyPolicyUrl)}</a>\". This email message was auto-generated. Please do not respond.</p>" +
                         $"<p>New Era Flower Store</p>" +
                         $"<hr />" +
-                        $"<p>©2018-{DateTimeOffset.Now.Year} SHIELD Technology, Inc.</p>");
+                        $"<p>©2019 SHIELD Technology, Inc.</p>");
 
                     StatusMessage = "To confirm your email and reset your password, a verification email has been sent. Please check your email, and pay attention that a verification email may be considered spam.";
 
                     return Page();
-                }
+                } // end if
 
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.Page(
@@ -113,10 +122,10 @@ namespace NewEraFlowerStore.Areas.Identity.Pages.Account
                     $"<p>For info on New Era Flower Store's privacy policy, please visit \"<a href='{HtmlEncoder.Default.Encode(privacyPolicyUrl)}'>{HtmlEncoder.Default.Encode(privacyPolicyUrl)}</a>\". This email message was auto-generated. Please do not respond.</p>" +
                     $"<p>New Era Flower Store</p>" +
                     $"<hr />" +
-                    $"<p>©2018-{DateTimeOffset.Now.Year} SHIELD Technology, Inc.</p>");
+                    $"<p>©2019 SHIELD Technology, Inc.</p>");
 
                 StatusMessage = "To reset your password, a verification email has been sent. Please check your email, and pay attention that a verification email may be considered spam.";
-            }
+            } // end if
 
             return Page();
         } // end method OnPostAsync
