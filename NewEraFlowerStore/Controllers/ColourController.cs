@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls validation related to colours
+
+#region Using Directives
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="ColourController"/> controls validation related to colours.
+    /// </summary>
     public class ColourController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,6 +26,11 @@ namespace NewEraFlowerStore.Controllers
         } // end constructor ColourController
 
         #region Remote Validation
+        /// <summary>
+        /// Verify whether the specified colour name is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyNameNotInUseAsync()
         {
@@ -41,7 +51,7 @@ namespace NewEraFlowerStore.Controllers
                     || (currentColour != null
                         && currentColour.Name != name))
                     return Json($"The name \"{name}\" is already in use.");
-            }
+            } // end if
 
             return Json(true);
         } // end method VerifyNameNotInUseAsync

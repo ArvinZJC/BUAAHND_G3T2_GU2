@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls validation related to application users
+
+#region Using Directives
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +12,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="ApplicationUserController"/> controls validation related to application users.
+    /// </summary>
     public class ApplicationUserController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +27,11 @@ namespace NewEraFlowerStore.Controllers
         } // end constructor ApplicationUserController
 
         #region Remote Validation
+        /// <summary>
+        /// Verify whether the specified username is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyUsernameNotInUseAsync()
         {
@@ -34,6 +44,11 @@ namespace NewEraFlowerStore.Controllers
             return Json(true);
         } // end method VerifyUsernameNotInUseAsync
 
+        /// <summary>
+        /// Verify whether the specified email is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyEmailNotInUseAsync()
         {
@@ -49,6 +64,11 @@ namespace NewEraFlowerStore.Controllers
             return Json(true);
         } // end method VerifyEmailNotInUseAsync
 
+        /// <summary>
+        /// Verify whether the specified address book name is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyAddressBookNameAsync()
         {

@@ -1,7 +1,17 @@
-﻿namespace NewEraFlowerStore.Extensions
+﻿// csharp file that performs as a decimal helper
+
+namespace NewEraFlowerStore.Extensions
 {
+    /// <summary>
+    /// The class <see cref="DecimalHelper"/> formats a specified decimal number.
+    /// </summary>
     public static class DecimalHelper
     {
+        /// <summary>
+        /// Format a specified decimal number to satisfy the price format.
+        /// </summary>
+        /// <param name="decimalNumber">a specified decimal number to format</param>
+        /// <returns>a decimal in the price format</returns>
         public static decimal ToPriceFormat(decimal decimalNumber)
         {
             var decimalNumberString = decimalNumber.ToString();

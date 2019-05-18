@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls validation related to occasions
+
+#region Using Directives
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="OccasionController"/> controls validation related to occasions.
+    /// </summary>
     public class OccasionController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,6 +43,11 @@ namespace NewEraFlowerStore.Controllers
         } // end constructor OccasionController
 
         #region Remote Validation
+        /// <summary>
+        /// Verify whether the specified occasion name is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyNameNotInUseAsync()
         {
@@ -58,13 +68,19 @@ namespace NewEraFlowerStore.Controllers
                     || (currentOccasion != null
                         && currentOccasion.Name != name))
                     return Json($"The name \"{name}\" is already in use.");
-            }
+            } // end if
 
             return Json(true);
         } // end method VerifyNameNotInUseAsync
         #endregion Remote Validation
 
         #region Cover Photo Uploader
+        /// <summary>
+        /// Save a specified occasion photo.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified occasion</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> SaveAsync(int? id)
         {
@@ -110,6 +126,7 @@ namespace NewEraFlowerStore.Controllers
                                     if (newFileName != occasionToUpdate.CoverPhotoUrl)
                                     {
                                         if (occasionToUpdate.CoverPhotoUrl != DefaultCoverPhotoFileName)
+                                            // call the specified method to delete the specified file
                                             if (!DeleteFile(CoverPhotoRootPath + occasionToUpdate.CoverPhotoUrl))
                                                 return new EmptyResult();
 
@@ -135,39 +152,45 @@ namespace NewEraFlowerStore.Controllers
                                                 Response.StatusCode = 404;
                                                 _logger.LogError(e, "Error! Failed to update cover photo URL.");
                                                 return new EmptyResult();
-                                            }
-                                        }
-                                    }
+                                            } // end if...else
+                                        } // end try...catch
+                                    } // end if
 
                                     _logger.LogInformation("Cover photo has changed successfully.");
-                                }
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! File cannot be saved. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to save file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method SaveAsync
 
+        /// <summary>
+        /// Delete a specified occasion photo.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified occasion</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> DeleteAsync(int? id)
         {
@@ -208,6 +231,7 @@ namespace NewEraFlowerStore.Controllers
 
                                     try
                                     {
+                                        // call the specified method to delete the specified file
                                         if (!DeleteFile(CoverPhotoRootPath + newFileName))
                                             return new EmptyResult();
 
@@ -226,36 +250,37 @@ namespace NewEraFlowerStore.Controllers
                                             Response.Clear();
                                             Response.StatusCode = 404;
                                             _logger.LogError(e, "Error! Failed to update cover photo URL.");
-                                        }
-                                    }
-                                }
+                                        } // end if...else
+                                    } // end try...catch
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! Cannot delete file. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to delete file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method DeleteAsync
 
+        // delete the specified file
         private bool DeleteFile(string filePath)
         {
             try
@@ -274,7 +299,7 @@ namespace NewEraFlowerStore.Controllers
                     _logger.LogWarning("File cannot be found.");
 
                     return true;
-                }
+                } // end if...else
             }
             catch (Exception e)
             {
@@ -282,7 +307,7 @@ namespace NewEraFlowerStore.Controllers
                 Response.StatusCode = 404;
                 _logger.LogError(e, "Error! Failed to delete file.");
                 return false;
-            }
+            } // end try...catch
         } // end method DeleteFile
         #endregion Cover Photo Uploader
     } // end class OccasionController

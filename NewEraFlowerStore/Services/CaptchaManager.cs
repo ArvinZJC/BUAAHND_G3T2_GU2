@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that performs as a captcha manager
+
+#region Using Directives
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Services
 {
+    /// <summary>
+    /// Extending from the class <see cref="ICaptchaManager"/>, the class <see cref="CaptchaManager"/> create/verify the captcha code.
+    /// </summary>
     public class CaptchaManager : ICaptchaManager
     {
         private const string fileFormat = "image/jpeg";
@@ -52,6 +57,13 @@ namespace NewEraFlowerStore.Services
             } // end for
         } // end constructor CaptchaManager
 
+        /// <summary>
+        /// Create the captcha code, as an asynchoronous operation.
+        /// </summary>
+        /// <param name="characterCount">the number of characters</param>
+        /// <param name="width">image width</param>
+        /// <param name="height">image height</param>
+        /// <returns>a <see cref="CaptchaInfo"/> object</returns>
         public async Task<CaptchaInfo> CreateAsync(int characterCount = 4, int width = 85, int height = 40)
         {
             var captchaInfo = new CaptchaInfo { FileFormat = fileFormat };
@@ -126,6 +138,12 @@ namespace NewEraFlowerStore.Services
             }
         } // end method CreateAsync
 
+        /// <summary>
+        /// Verify the captcha code, as an asynchoronous operation.
+        /// </summary>
+        /// <param name="captchaRequest">a <see cref="CaptchaRequest"/> object</param>
+        /// <param name="timeOut">period before the timeout</param>
+        /// <returns>a <see cref="CaptchaResponse"/> object</returns>
         public async Task<CaptchaResponse> VerifyAsync(CaptchaRequest captchaRequest, int timeOut = 120)
         {
             try
@@ -171,6 +189,14 @@ namespace NewEraFlowerStore.Services
             } // end try...catch
         } // end method VerifyAsync
 
+        /// <summary>
+        /// Add interferencial curve and disturbance points to a captcha image.
+        /// </summary>
+        /// <param name="random">a <see cref="Random"/> object</param>
+        /// <param name="bitmap">a <see cref="Bitmap"/> object</param>
+        /// <param name="graphics">a <see cref="Graphics"/> object</param>
+        /// <param name="lineCount">the number of lines</param>
+        /// <param name="pointCount">the number of points</param>
         public static void AddInterference(Random random, Bitmap bitmap, Graphics graphics, int lineCount, int pointCount)
         {
             // add interferencial curve

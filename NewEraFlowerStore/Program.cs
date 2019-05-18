@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains configuration for the program
+
+#region Using Directives
 using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +13,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore
 {
+    /// <summary>
+    /// The class <see cref="Program"/> contains configuration for the program.
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)

@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls validation related to bouquets
+
+#region Using Directives
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="BouquetController"/> controls validation related to bouquets.
+    /// </summary>
     public class BouquetController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -40,6 +45,11 @@ namespace NewEraFlowerStore.Controllers
         } // end constructor BouquetController
 
         #region Remote Validation
+        /// <summary>
+        /// Verify whether the specified bouquet name is in use or not.
+        /// This method is decorated with <see cref="HttpGetAttribute"/>.
+        /// </summary>
+        /// <returns>a <see cref="JsonResult"/> object that serialises the verification result to JSON</returns>
         [HttpGet]
         public async Task<IActionResult> VerifyNameNotInUseAsync()
         {
@@ -60,7 +70,7 @@ namespace NewEraFlowerStore.Controllers
                     || (currentBouquet != null
                         && currentBouquet.Name != name))
                     return Json($"The name \"{name}\" is already in use.");
-            }
+            } // end if
 
             return Json(true);
         } // end method VerifyNameNotInUseAsync
@@ -68,6 +78,12 @@ namespace NewEraFlowerStore.Controllers
 
         #region Photo Uploader
         #region Photo 1
+        /// <summary>
+        /// Save Bouquet Photo 1.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified bouquet</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> SavePhoto1Async(int? id)
         {
@@ -113,6 +129,7 @@ namespace NewEraFlowerStore.Controllers
                                     if (newFileName != bouquetToUpdate.PhotoUrl1)
                                     {
                                         if (bouquetToUpdate.PhotoUrl1 != DefaultPhoto1FileName)
+                                            // call the specified method to delete the specified file
                                             if (!DeleteFile(BouquetPhotoRootPath + bouquetToUpdate.PhotoUrl1))
                                                 return new EmptyResult();
 
@@ -138,39 +155,45 @@ namespace NewEraFlowerStore.Controllers
                                                 Response.StatusCode = 404;
                                                 _logger.LogError(e, "Error! Failed to update URL of Photo 1.");
                                                 return new EmptyResult();
-                                            }
-                                        }
-                                    }
+                                            } // end if...else
+                                        } // end try...catch
+                                    } // end if
 
                                     _logger.LogInformation("Photo 1 has changed successfully.");
-                                }
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! File cannot be saved. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to save file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method SavePhoto1Async
 
+        /// <summary>
+        /// Delete Bouquet Photo 1.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified bouquet</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> DeletePhoto1Async(int? id)
         {
@@ -211,6 +234,7 @@ namespace NewEraFlowerStore.Controllers
 
                                     try
                                     {
+                                        // call the specified method to delete the specified file
                                         if (!DeleteFile(BouquetPhotoRootPath + newFileName))
                                             return new EmptyResult();
 
@@ -229,38 +253,44 @@ namespace NewEraFlowerStore.Controllers
                                             Response.Clear();
                                             Response.StatusCode = 404;
                                             _logger.LogError(e, "Error! Failed to update URL of Photo 1.");
-                                        }
-                                    }
-                                }
+                                        } // end if...else
+                                    } // end try...catch
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! Cannot delete file. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to delete file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method DeletePhoto1Async
         #endregion Photo 1
 
         #region Photo 2
+        /// <summary>
+        /// Save Bouquet Photo 2.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified bouquet</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> SavePhoto2Async(int? id)
         {
@@ -305,6 +335,7 @@ namespace NewEraFlowerStore.Controllers
 
                                     if (newFileName != bouquetToUpdate.PhotoUrl2)
                                     {
+                                        // call the specified method to delete the specified file
                                         if (bouquetToUpdate.PhotoUrl2 != DefaultPhoto2FileName)
                                             if (!DeleteFile(BouquetPhotoRootPath + bouquetToUpdate.PhotoUrl2))
                                                 return new EmptyResult();
@@ -331,39 +362,45 @@ namespace NewEraFlowerStore.Controllers
                                                 Response.StatusCode = 404;
                                                 _logger.LogError(e, "Error! Failed to update URL of Photo 2.");
                                                 return new EmptyResult();
-                                            }
-                                        }
-                                    }
+                                            } // end if...else
+                                        } // end try...catch
+                                    } // end if
 
                                     _logger.LogInformation("Photo 2 has changed successfully.");
-                                }
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! File cannot be saved. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to save file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method SavePhoto2Async
 
+        /// <summary>
+        /// Delete Bouquet Photo 2.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <param name="id">ID of a specified bouquet</param>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> DeletePhoto2Async(int? id)
         {
@@ -404,6 +441,7 @@ namespace NewEraFlowerStore.Controllers
 
                                     try
                                     {
+                                        // call the specified method to delete the specified file
                                         if (!DeleteFile(BouquetPhotoRootPath + newFileName))
                                             return new EmptyResult();
 
@@ -422,37 +460,38 @@ namespace NewEraFlowerStore.Controllers
                                             Response.Clear();
                                             Response.StatusCode = 404;
                                             _logger.LogError(e, "Error! Failed to update URL of Photo 2.");
-                                        }
-                                    }
-                                }
+                                        } // end if...else
+                                    } // end try...catch
+                                } // end foreach
                             }
                             else
                             {
                                 Response.Clear();
                                 Response.StatusCode = 404;
                                 _logger.LogError("Error! Cannot delete file. User does not exist.");
-                            }
+                            } // end if...else
                         }
                         else
                         {
                             Response.Clear();
                             Response.StatusCode = 404;
                             _logger.LogError("Error! Failed to get file list from the request.");
-                        }
+                        } // end if...else
                     }
                     catch (Exception e)
                     {
                         Response.Clear();
                         Response.StatusCode = 404;
                         _logger.LogError(e, "Error! Failed to delete file.");
-                    }
-                }
-            }
+                    } // end try...catch
+                } // end if...else
+            } // end if...else
 
             return new EmptyResult();
         } // end method DeletePhoto2Async
         #endregion Photo 2
 
+        // delete the specified file
         private bool DeleteFile(string filePath)
         {
             try
@@ -471,7 +510,7 @@ namespace NewEraFlowerStore.Controllers
                     _logger.LogWarning("File cannot be found.");
 
                     return true;
-                }
+                } // end if...else
             }
             catch (Exception e)
             {
@@ -479,7 +518,7 @@ namespace NewEraFlowerStore.Controllers
                 Response.StatusCode = 404;
                 _logger.LogError(e, "Error! Failed to delete file.");
                 return false;
-            }
+            } // end try...catch
         } // end method DeleteFile
         #endregion Photo Uploader
     } // end class BouquetController

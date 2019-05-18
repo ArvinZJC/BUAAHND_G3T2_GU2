@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the bouquet list page for all bouquets or matching bouquets according to the search string, price, colour, flower, and occasion
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Pages.Bouquets
 {
+    /// <summary>
+    /// Extending from the class <see cref="PageModel"/>, the class <see cref="ListModel"/> contains actions of the bouquet list page for all bouquets or matching bouquets according to the search string, price, colour, flower, and occasion.
+    /// </summary>
     public class ListModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -25,46 +30,89 @@ namespace NewEraFlowerStore.Pages.Bouquets
             _userManager = userManager;
         } // end constructor ListModel
 
+        /// <summary>
+        /// The number of bouquets.
+        /// </summary>
         public int BouquetsCount { get; set; }
-
+        /// <summary>
+        /// The number of matching bouquets.
+        /// </summary>
         public int MatchingBouquetsCount { get; set; }
-
+        /// <summary>
+        /// The number of matching cart details.
+        /// </summary>
         public int MatchingCartDetailsCount { get; set; }
-
+        /// <summary>
+        /// ID of the current flower.
+        /// </summary>
         public int? CurrentFlowerId { get; set; }
-
+        /// <summary>
+        /// ID of the current occasion.
+        /// </summary>
         public int? CurrentOccasionId { get; set; }
-
+        /// <summary>
+        /// ID of the current colour.
+        /// </summary>
         public int? CurrentColourId { get; set; }
-
+        /// <summary>
+        /// The current page index.
+        /// </summary>
         public int? CurrentPageIndex { get; set; }
-
+        /// <summary>
+        /// The current lowest price.
+        /// </summary>
         public decimal? CurrentLowestPrice { get; set; }
-
+        /// <summary>
+        /// The current highest price.
+        /// </summary>
         public decimal? CurrentHighestPrice { get; set; }
-
+        /// <summary>
+        /// The current sort order.
+        /// </summary>
         public string CurrentSortOrder { get; set; }
-
+        /// <summary>
+        /// The current filter.
+        /// </summary>
         public string CurrentFilter { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether the login user is an administrator or not.
+        /// </summary>
         public bool IsAdministrator { get; set; }
-
+        /// <summary>
+        /// A colour list.
+        /// </summary>
         public IList<Colour> ColourList { get; set; }
-
+        /// <summary>
+        /// A <see cref="Flower"/> object.
+        /// </summary>
         public Flower CurrentFlower { get; set; }
-
+        /// <summary>
+        /// A flower list.
+        /// </summary>
         public IList<Flower> FlowerList { get; set; }
-
+        /// <summary>
+        /// An <see cref="Occasion"/> object.
+        /// </summary>
         public Occasion CurrentOccasion { get; set; }
-
+        /// <summary>
+        /// An occasion list.
+        /// </summary>
         public IList<Occasion> OccasionList { get; set; }
-
+        /// <summary>
+        /// Matching cart details.
+        /// </summary>
         public IQueryable<CartDetail> MatchingCartDetails { get; set; }
-
+        /// <summary>
+        /// A paginated list of matching bouquets.
+        /// </summary>
         public PaginatedList<Bouquet> MatchingBouquetList { get;set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -267,7 +315,7 @@ namespace NewEraFlowerStore.Pages.Bouquets
                 } // end if...else
             }
             else
-                StatusMessage = "Error! No bouquet found on shelves";
+                StatusMessage = "Error! No bouquet found on shelves.";
 
             int pageSize = 12; // the code of pagination in the bouquet list page needs improving after modifying the page size
 

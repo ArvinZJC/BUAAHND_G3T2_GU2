@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the cart page
+
+#region Using Directives
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,9 @@ using NewEraFlowerStore.Extensions;
 
 namespace NewEraFlowerStore.Pages
 {
+    /// <summary>
+    /// Extending from the class <see cref="PageModel"/>, the class <see cref="CartModel"/> decorated with <see cref="AuthorizeAttribute"/> contains actions of the cart page.
+    /// </summary>
     [Authorize(Roles = "Customer")]
     public class CartModel : PageModel
     {
@@ -33,12 +38,21 @@ namespace NewEraFlowerStore.Pages
             _logger = logger;
         } // end constructor CartModel
 
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// The number of matching cart details.
+        /// </summary>
         public int MatchingCartDetailsCount { get; set; }
-
+        /// <summary>
+        /// A matching cart detail list
+        /// </summary>
         public IList<CartDetail> MatchingCartDetailList { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 

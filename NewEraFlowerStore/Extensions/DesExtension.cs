@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that performs as a DES encryptor/decryptor
+
+#region Using Directives
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -8,11 +10,19 @@ using System.Threading.Tasks;
 
 namespace NewEraFlowerStore.Extensions
 {
+    /// <summary>
+    /// The class <see cref="DesExtension"/> encrypts/decrypts a string value with DES.
+    /// </summary>
     public static class DesExtension
     {
         private const string encryptionKey = "LOVEROSE";
         private static readonly Encoding defaultEncoding = Encoding.UTF8;
 
+        /// <summary>
+        /// Encrypt a string value with DES, as an asynchronous operation.
+        /// </summary>
+        /// <param name="value">a specified string value</param>
+        /// <returns>an encrypted string value</returns>
         public static async Task<string> EncryptAsync(this string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -43,6 +53,11 @@ namespace NewEraFlowerStore.Extensions
             }
         } // end method EncryptAsync
 
+        /// <summary>
+        /// Decrypt a string value, as an asynchronous operation.
+        /// </summary>
+        /// <param name="value">a specified string value</param>
+        /// <returns>a decrypted string value</returns>
         public static async Task<string> DecryptAsync(this string value)
         {
             if (string.IsNullOrEmpty(value))

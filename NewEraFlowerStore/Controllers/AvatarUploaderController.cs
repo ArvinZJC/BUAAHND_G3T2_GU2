@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls validation related to the avatar uploader
+
+#region Using Directives
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -13,6 +15,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="AvatarUploaderController"/> controls validation related to the avatar uploader.
+    /// </summary>
     public class AvatarUploaderController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -36,6 +41,11 @@ namespace NewEraFlowerStore.Controllers
             DefaultAvatarFileName = "_default.jpg";
         } // end constructor AvatarUploaderController
 
+        /// <summary>
+        /// Save the avatar file.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> SaveAsync()
         {
@@ -108,6 +118,11 @@ namespace NewEraFlowerStore.Controllers
             return new EmptyResult();
         } // end method SaveAsync
 
+        /// <summary>
+        /// Delete the avatar file.
+        /// This method is decorated with <see cref="HttpPostAttribute"/>.
+        /// </summary>
+        /// <returns>an <see cref="EmptyResult"/> object</returns>
         [HttpPost]
         public async Task<IActionResult> DeleteAsync()
         {
@@ -131,6 +146,7 @@ namespace NewEraFlowerStore.Controllers
 
                             if (result.Succeeded)
                             {
+                                // call the specified method to delete the specified file
                                 if (!DeleteFile(AvatarRootPath + newFileName))
                                     return new EmptyResult();
 
@@ -169,6 +185,7 @@ namespace NewEraFlowerStore.Controllers
             return new EmptyResult();
         } // end method DeleteAsync
 
+        // delete the specified file
         private bool DeleteFile(string filePath)
         {
             try

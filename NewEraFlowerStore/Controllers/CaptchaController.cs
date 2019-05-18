@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that controls the connection to the captcha manager
+
+#region Using Directives
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +9,9 @@ using NewEraFlowerStore.Services;
 
 namespace NewEraFlowerStore.Controllers
 {
+    /// <summary>
+    /// Extending from class <see cref="Controller"/>, the class <see cref="CaptchaController"/> controls the connection to the captcha manager.
+    /// </summary>
     public class CaptchaController : Controller
     {
         private readonly ICaptchaManager _captchaManager;
@@ -16,6 +21,10 @@ namespace NewEraFlowerStore.Controllers
             _captchaManager = captchaManager;
         } // end constructor CaptchaController
 
+        /// <summary>
+        /// Add a new cookie and the relevant captcha content, and then return a captcha image file.
+        /// </summary>
+        /// <returns>a captcha image file</returns>
         [HttpGet]
         public async Task<IActionResult> Image()
         {

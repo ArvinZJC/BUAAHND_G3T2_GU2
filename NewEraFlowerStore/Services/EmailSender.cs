@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that provides a service of sending emails
+
+#region Using Directives
 using System;
 using System.Net;
 using System.Net.Mail;
@@ -11,6 +13,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Services
 {
+    /// <summary>
+    /// Extending from the class <see cref="IEmailSender"/>, the class <see cref="EmailSender"/> provides a service of sending emails.
+    /// </summary>
     public class EmailSender : IEmailSender
     {
         private readonly EmailSettings _emailSettings;
@@ -20,6 +25,13 @@ namespace NewEraFlowerStore.Services
             _emailSettings = emailSettings.Value;
         } // end constructor EmailSender
 
+        /// <summary>
+        /// Send a specified email, as an asynchoronous operation.
+        /// </summary>
+        /// <param name="email">an email address</param>
+        /// <param name="subject">an email's subject</param>
+        /// <param name="message">an email's message</param>
+        /// <returns>the status that has already completed successfully or an <see cref="InvalidOperationException"/> object</returns>
         public Task SendEmailAsync(string email, string subject, string message)
         {
             try

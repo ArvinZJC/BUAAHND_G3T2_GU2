@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains the Entity Framework database context used for customised Identity
+
+#region Using Directives
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NewEraFlowerStore.Data
 {
+    /// <summary>
+    /// Extending from the class <see cref="IdentityDbContext"/>, the class <see cref="ApplicationDbContext"/> contains the Entity Framework database context used for customised Identity.
+    /// </summary>
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -13,21 +18,13 @@ namespace NewEraFlowerStore.Data
         } // end constructor ApplicationDbContext
 
         public DbSet<AddressBook> AddressBooks { get; set; }
-
         public DbSet<Bouquet> Bouquets { get; set; }
-
         public DbSet<CartDetail> CartDetails { get; set; }
-
         public DbSet<Colour> Colours { get; set; }
-
         public DbSet<Flower> Flowers { get; set; }
-
         public DbSet<Occasion> Occasions { get; set; }
-
         public DbSet<Order> Orders { get; set; }
-
         public DbSet<OrderDetail> OrderDetails { get; set; }
-
         public DbSet<SalesRecord> SalesRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

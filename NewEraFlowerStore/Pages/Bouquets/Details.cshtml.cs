@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains actions of the bouquet detail page
+
+#region Using Directives
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,9 @@ using NewEraFlowerStore.Data;
 
 namespace NewEraFlowerStore.Pages.Bouquets
 {
+    /// <summary>
+    /// Extending from the class <see cref="PageModel"/>, the class <see cref="DetailsModel"/> contains actions of the bouquet detail page.
+    /// </summary>
     public class DetailsModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -22,18 +27,33 @@ namespace NewEraFlowerStore.Pages.Bouquets
             _userManager = userManager;
         } // end constructor DetailsModel
 
+        /// <summary>
+        /// The number of bouquets.
+        /// </summary>
         public int BouquetsCount { get; set; }
-
+        /// <summary>
+        /// The number of matching cart details.
+        /// </summary>
         public int MatchingCartDetailsCount { get; set; }
-
+        /// <summary>
+        /// Available stocks.
+        /// </summary>
         public int AvaliableStocks { get; set; }
-
+        /// <summary>
+        /// Indicate whether the email is confirmed or not.
+        /// </summary>
         public bool IsEmailConfirmed { get; set; }
-
+        /// <summary>
+        /// Indicate whether the login user is an administrator or not.
+        /// </summary>
         public bool IsAdministrator { get; set; }
-
+        /// <summary>
+        /// A <see cref="Data.Bouquet"/> object.
+        /// </summary>
         public Bouquet Bouquet { get; set; }
-
+        /// <summary>
+        /// A status message decorated with <see cref="TempDataAttribute"/>.
+        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -88,7 +108,7 @@ namespace NewEraFlowerStore.Pages.Bouquets
                 IsEmailConfirmed = false;
                 IsAdministrator = false;
                 MatchingCartDetailsCount = 0;
-            }
+            } // end if...else
 
             return Page();
         } // end method OnGetAsync

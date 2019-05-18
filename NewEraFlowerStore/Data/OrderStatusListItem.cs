@@ -1,16 +1,32 @@
-﻿using System.Collections.Generic;
+﻿// csharp file that contains data configuration for an order status list
+
+using System.Collections.Generic;
 
 namespace NewEraFlowerStore.Data
 {
-    // any changes in this class require an update to the relevant code in the pages for orders
+    /// <summary>
+    /// The class <see cref="OrderStatusListItem"/> contains data configuration for an order status list.
+    /// Any changes in this class require an update to the relevant code in the pages for orders.
+    /// </summary>
     public class OrderStatusListItem
     {
+        /// <summary>
+        /// A display name of an item in an order status list.
+        /// </summary>
         public string DisplayName { get; set; }
-
+        /// <summary>
+        /// ID of an item in an order status list.
+        /// </summary>
         public int ID { get; set; }
-
+        /// <summary>
+        /// A description of an item in an order status list.
+        /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Get an order status list.
+        /// </summary>
+        /// <returns>an order status list</returns>
         public List<OrderStatusListItem> GetOrderStatusList()
         {
             List<OrderStatusListItem> orderStatusList = new List<OrderStatusListItem>
@@ -91,6 +107,11 @@ namespace NewEraFlowerStore.Data
             return orderStatusList;
         } // end method GetOrderStatusList
 
+        /// <summary>
+        /// Validate whether the specified ID is valid or not.
+        /// </summary>
+        /// <param name="ID">ID of an item in an order status list</param>
+        /// <returns>a Boolean value (true or false)</returns>
         public bool IsValidId(int ID)
         {
             switch (ID)

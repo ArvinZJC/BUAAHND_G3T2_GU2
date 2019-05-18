@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that initialise the database
+
+#region Using Directives
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
@@ -7,8 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NewEraFlowerStore.Data
 {
+    /// <summary>
+    /// The class <see cref="DbInitialiser"/> initialises the database.
+    /// </summary>
     public class DbInitialiser
     {
+        /// <summary>
+        /// Initialise the database, as an asynchronous operation.
+        /// </summary>
+        /// <param name="userManager">a user manager</param>
+        /// <param name="roleManager">a role manager</param>
+        /// <param name="context">the database context</param>
         public static async void InitialiseAsync(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,

@@ -1,4 +1,6 @@
-﻿#region Using Directives
+﻿// csharp file that contains configuration for starting up the application
+
+#region Using Directives
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +19,9 @@ using NewEraFlowerStore.Services;
 
 namespace NewEraFlowerStore
 {
+    /// <summary>
+    /// The class <see cref="Startup"/> contains configuration for starting up the web application.
+    /// </summary>
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -90,7 +95,7 @@ namespace NewEraFlowerStore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment environment)
         {
-            SyncfusionLicenseProvider.RegisterLicense("OTk3MjlAMzEzNzJlMzEyZTMwbUFjSmgzU2MwU2VGWUg3N01zTDRZcmhIeDd0aFM1T0JSREFOdTZtZ21Zdz0="); // register the license key for Syncfusion Essential JS 2 (Version 17.1.0.44)
+            SyncfusionLicenseProvider.RegisterLicense("MTAyMjU4QDMxMzcyZTMxMmUzMFgwd1BTZjFLNXB0bGtCSWFtbHg1Y2Q3Y2hCWGpqN3J2czVNb1NDMjVFQUU9"); // register the license key for Syncfusion Essential JS 2 (Version 17.1.0.47)
 
             if (environment.IsDevelopment())
             {
