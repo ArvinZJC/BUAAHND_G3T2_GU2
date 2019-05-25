@@ -95,7 +95,7 @@ namespace NewEraFlowerStore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment environment)
         {
-            SyncfusionLicenseProvider.RegisterLicense("MTAyMjU4QDMxMzcyZTMxMmUzMFgwd1BTZjFLNXB0bGtCSWFtbHg1Y2Q3Y2hCWGpqN3J2czVNb1NDMjVFQUU9"); // register the license key for Syncfusion Essential JS 2 (Version 17.1.0.47)
+            SyncfusionLicenseProvider.RegisterLicense("MTA0NTM1QDMxMzcyZTMxMmUzMGpybDcyQTBqaUJOVDBYZjRqOFRVcVpFRENab2gwNHlqcHFhblhOL1QvaHc9"); // register the license key for Syncfusion Essential JS 2 (Version 17.1.0.48)
 
             if (environment.IsDevelopment())
             {
