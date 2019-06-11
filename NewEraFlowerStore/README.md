@@ -27,6 +27,7 @@ This project is named as New Era Flower Store which contains a simplified online
 | jQuery Validation | 1.19.0 |
 | Microsoft.jQuery.Unobtrusive.Validation | 3.2.11 |
 | Syncfusion Essential JS2 | 17.1.0.48 |
+
 Form 1
 
 1. By 25 May 2019, the versions of main components in the application had been listed in the above form.
