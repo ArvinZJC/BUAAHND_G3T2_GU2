@@ -19,7 +19,7 @@ This project is named as New Era Flower Store which contains a simplified online
 
 1. By 25 May 2019, the versions of main components in the application had been listed as follows:
    | Name | Version |
-   | --- | --- |
+   | :-- | :--: |
    | ASP.NET Core | 2.2.5 |
    | MySQL | 8.0.15 |
    | Bootstrap | 4.3.1 |
