@@ -17,17 +17,19 @@ This project is named as New Era Flower Store which contains a simplified online
 
 ## ATTENTION
 
-1. By 25 May 2019, the versions of main components in the application had been listed as follows:
-   | Name | Version |
-   | :-- | :--: |
-   | ASP.NET Core | 2.2.5 |
-   | MySQL | 8.0.15 |
-   | Bootstrap | 4.3.1 |
-   | Fontawesome (Free) | 5.6.3 |
-   | jQuery | 3.3.1 |
-   | jQuery Validation | 1.19.0 |
-   | Microsoft.jQuery.Unobtrusive.Validation | 3.2.11 |
-   | Syncfusion Essential JS2 | 17.1.0.48 |
+| Name | Version |
+| :-- | :--: |
+| ASP.NET Core | 2.2.5 |
+| MySQL | 8.0.15 |
+| Bootstrap | 4.3.1 |
+| Fontawesome (Free) | 5.6.3 |
+| jQuery | 3.3.1 |
+| jQuery Validation | 1.19.0 |
+| Microsoft.jQuery.Unobtrusive.Validation | 3.2.11 |
+| Syncfusion Essential JS2 | 17.1.0.48 |
+Form 1
+
+1. By 25 May 2019, the versions of main components in the application had been listed in the above form.
 2. In order to make MySQL support storing data containing emoji (😂, 😊, 😘, etc.), MySQL needs configuring. There is a web page showing how to do this: <https://www.cnblogs.com/lurenjiashuo/p/mysql-emoji.html>.
 3. When debugging in the development environment, the application will initialise data in the database (NewEraFlowerStore\Data\DbInitialiser.cs), each time it starts. This includes administrator data, customer data, colour data, flower data, occasion data, bouquet data, and sales record data. The following are accounts for test purposes:
    * (Administrator) NefsStaff1/nefsstaff1@shieldadmin.com, nefsstaff1
