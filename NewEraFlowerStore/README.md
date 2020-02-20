@@ -1,6 +1,6 @@
 # NewEraFlowerStore From the Project BUAAHND_G3T2_GU2
 
-This project is named as New Era Flower Store which contains a simplified online flower store sales management system based on web developed by me as the final assignment of the course **Graded Unit 2**  during Term 2 of Grade 3 in BUAA HND. It must be admitted that although I worked hard on developing a system close to these commercial ones, I still have a long way to go.
+This project is named as **New Era Flower Store** which contains a simplified online flower store sales management system based on web developed by me as the final assignment of the course **Graded Unit 2**  during Term 2 of Grade 3 in BUAA HND. It must be admitted that although I worked hard on developing a system close to these commercial ones, I still have a long way to go.
 
 ## Partial UI
 
